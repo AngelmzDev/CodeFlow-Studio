@@ -66,6 +66,20 @@ npm start
 
 Abre la dirección local que indique el CLI. Para crear un diagrama, escribe o pega código Java o Python y pulsa **Crear diagrama**. El análisis estático no ejecuta el programa.
 
+## Servidor MCP
+
+CodeFlow Studio incluye un servidor local MCP por `stdio` para Codex, Claude Code, OpenCode y otros clientes compatibles. Reutiliza los mismos adaptadores, diagramas, explicaciones y exportadores de la aplicación; no envía código ni resultados a servicios externos y no necesita claves API.
+
+```sh
+npm install
+npm run build
+npm run mcp
+```
+
+El servidor expone `codeflow_analyze`, `codeflow_diagram`, `codeflow_trace`, `codeflow_variables`, `codeflow_explain` y `codeflow_export`. El análisis, los diagramas, la consulta de variables, las explicaciones y las exportaciones no escriben archivos elegidos por el agente. `codeflow_trace` está deshabilitada por defecto y nunca debe usarse con código no confiable: la ejecución ocurre con los permisos del usuario y no está aislada.
+
+La [guía completa de MCP](docs/mcp.md) explica la configuración portable para Codex, Claude Code y OpenCode, la verificación, la autorización de ejecución y la desconexión. Las referencias de configuración se basan en la documentación oficial de [Codex](https://learn.chatgpt.com/docs/extend/mcp), [Claude Code](https://code.claude.com/docs/en/mcp), [OpenCode](https://dev.opencode.ai/v2/docs/mcp-servers/) y el [SDK TypeScript de MCP](https://ts.sdk.modelcontextprotocol.io/v2/).
+
 ## Requisitos
 
 - Node.js 24 o posterior y npm.
@@ -93,7 +107,7 @@ No pegues claves, contraseñas ni código confidencial que no quieras guardar en
 
 Solo Java y Python tienen adaptadores operativos. La ejecución admite programas secuenciales de un archivo fuente. La actividad estática cubre un subconjunto de `if`, bucles, `return`, `break` y `continue`; las condiciones no se evalúan y las construcciones no compatibles pueden aparecer como opacas. Las instantáneas, vistas de variables y objetos dependen de la información que exponga cada entorno de ejecución. La ejecución usa los permisos del usuario y sus límites son salvaguardas de mejor esfuerzo, no aislamiento.
 
-Consulta la [guía de usuario](docs/user-guide.md), la [guía para estudiantes](docs/guia-estudiantes.md), la [arquitectura](docs/architecture.md), la [guía de adaptadores](docs/adapters.md), el [formato de traza](docs/trace-format.md) y la [hoja de ruta](docs/roadmap.md). El formato neutral de intercambio no implica soporte para otros lenguajes. La visualización usa `@dagrejs/dagre` como dependencia de ejecución.
+Consulta la [guía de usuario](docs/user-guide.md), la [guía para estudiantes](docs/guia-estudiantes.md), la [guía MCP](docs/mcp.md), la [arquitectura](docs/architecture.md), la [guía de adaptadores](docs/adapters.md), el [formato de traza](docs/trace-format.md) y la [hoja de ruta](docs/roadmap.md). El formato neutral de intercambio no implica soporte para otros lenguajes. La visualización usa `@dagrejs/dagre` como dependencia de ejecución.
 
 ## Licencia
 

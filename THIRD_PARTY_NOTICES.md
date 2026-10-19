@@ -4,9 +4,12 @@
 
 CodeFlow Studio takes architectural inspiration from [diagram-design](https://github.com/cathrynlavery/diagram-design), an MIT-licensed project. In particular, the project informed thinking about diagram semantics, profiles and deterministic HTML validation. No source code or templates from that project are copied into CodeFlow Studio.
 
-## Runtime dependencies
+## Runtime and MCP dependencies
 
-CodeFlow Studio uses Node.js built-in modules at runtime and delegates tracing to the installed JDK and Python interpreter. The web build uses esbuild as a development/build dependency. Consult the package lockfile and each upstream project's license for the exact versions distributed or installed in a given release.
+CodeFlow Studio uses Node.js built-in modules at runtime and delegates tracing to the installed JDK and Python interpreter. The MCP server uses `@modelcontextprotocol/server`, its `@modelcontextprotocol/core` dependency, and Zod; these projects are licensed under MIT. The official `@modelcontextprotocol/client`, also MIT licensed, is used only for protocol integration tests. The web build uses esbuild as a development/build dependency. Consult the package lockfile and each upstream project's license for the exact versions distributed or installed in a given release.
+
+- MCP TypeScript SDK: <https://github.com/modelcontextprotocol/typescript-sdk>
+- Zod: <https://github.com/colinhacks/zod>
 
 ## Dagre and Graphlib
 
