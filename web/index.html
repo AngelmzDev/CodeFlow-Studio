@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="es" data-mode="basic">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>CodeFlow Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell" id="app">
+      <aside
+        class="sidebar"
+        aria-label="Espacio de trabajo"
+        data-i18n-aria="workspace"
+      >
+        <a class="brand" href="#">
+          <span class="brand-mark" aria-hidden="true"
+            ><svg viewBox="0 0 32 32">
+              <path
+                d="M11.5 8 4 16l7.5 8M20.5 8 28 16l-7.5 8M18.5 5l-5 22"
+              /></svg
+          ></span>
+          <span><strong>CodeFlow</strong><small>STUDIO</small></span>
+        </a>
+        <div class="side-label" data-i18n="workspace">Espacio de trabajo</div>
+        <div class="workspace-card">
+          <span class="workspace-dot"></span>
+          <div>
+            <strong data-i18n="localWorkspace">Espacio local</strong
+            ><small id="workspace-state" data-i18n="connecting"
+              >Comprobando servicio local</small
+            >
+          </div>
+          <span class="chevron">⌄</span>
+        </div>
+        <div class="side-label language-label">
+          <span data-i18n="languages">LENGUAJES</span>
+          <span id="adapter-count">—</span>
+        </div>
+        <nav
+          class="language-list"
+          id="language-list"
+          aria-label="Lenguajes disponibles"
+          data-i18n-aria="languages"
+        ></nav>
+        <div class="sidebar-spacer"></div>
+        <div class="side-note">
+          <span class="shield-icon" aria-hidden="true">⌑</span>
+          <div>
+            <strong data-i18n="localExecution">Ejecución en tu equipo</strong>
+            <p data-i18n="localExecutionNotice">
+              El código se ejecuta localmente con tus permisos.
+            </p>
+          </div>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" type="button">
+          <span aria-hidden="true">◐</span
+          ><span data-i18n="appearance">Apariencia</span><kbd>Ctrl/⌘ K</kbd>
+        </button>
+        <div class="sidebar-footer">
+          <span class="status-led"></span
+          ><span id="server-status" data-i18n="serverConnecting"
+            >Comprobando servicio local</span
+          ><span class="version">v0.1.0</span>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <h1 class="sr-only">CodeFlow Studio</h1>
+        <header class="topbar">
+          <div class="breadcrumb">
+            <span data-i18n="workspace">Espacio de trabajo</span
+            ><span class="slash">/</span
+            ><strong id="file-label" data-i18n="untitled">Sin título</strong
+            ><span class="dirty-dot" id="dirty-dot" hidden></span>
+          </div>
+          <div class="toolbar">
+            <label class="toolbar-choice"
+              ><span class="sr-only" data-i18n="mode">Modo</span
+              ><select id="mode-select" aria-label="Modo" data-i18n-aria="mode">
+                <option value="basic" selected data-i18n="basic">Básico</option>
+                <option value="advanced" data-i18n="advanced">Avanzado</option>
+              </select></label
+            >
+            <label class="toolbar-choice"
+              ><span class="sr-only" data-i18n="interfaceLanguage"
+                >Idioma de la interfaz</span
+              ><select
+                id="ui-language"
+                aria-label="Idioma de la interfaz"
+                data-i18n-aria="interfaceLanguage"
+              >
+                <option value="es" selected>ES</option>
+                <option value="en">EN</option>
+              </select></label
+            >
+            <label class="toolbar-choice theme-choice"
+              ><span class="sr-only" data-i18n="appearance">Apariencia</span
+              ><select
+                id="theme-select"
+                aria-label="Apariencia"
+                data-i18n-aria="appearance"
+              >
+                <option value="light" data-i18n="light">☀ Claro</option>
+                <option value="dark" data-i18n="dark">☾ Oscuro</option>
+              </select></label
+            >
+            <button
+              class="tool-button layout-reset"
+              id="layout-reset"
+              type="button"
+              data-layout-i18n="reset"
+            >
+              Restaurar distribución
+            </button>
+            <label class="select-wrap"
+              ><span class="lang-glyph" id="language-glyph">—</span
+              ><select
+                id="language-select"
+                aria-label="Idioma"
+                data-i18n-aria="language"
+              ></select
+              ><span class="select-caret">⌄</span></label
+            >
+            <button
+              class="tool-button"
+              id="import-button"
+              type="button"
+              title="Importar código"
+              data-i18n-title="importSource"
+            >
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5M4 12v4h12v-4" /></svg
+              ><span data-i18n="importSource">Import source</span>
+            </button>
+            <input id="source-file" type="file" hidden />
+            <button
+              class="tool-button"
+              id="import-trace-button"
+              type="button"
+              title="Importar traza JSON"
+              data-i18n-title="importTrace"
+            >
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M4 3h8l4 4v10H4zM12 3v5h4M7 11h6M7 14h4" /></svg
+              ><span data-i18n="importTrace">Import trace</span>
+            </button>
+            <input
+              id="trace-file"
+              type="file"
+              accept=".json,application/json"
+              hidden
+            />
+            <span id="run-button-home"></span>
+            <button
+              class="run-button"
+              id="run-button"
+              data-i18n-title="runTrace"
+              type="button"
+            >
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="m7 4 9 6-9 6z" /></svg
+              ><span data-i18n="runTrace">Run trace</span><kbd>Ctrl/⌘ ↵</kbd>
+            </button>
+          </div>
+        </header>
+
+        <section
+          class="trust-banner"
+          id="trust-banner"
+          aria-label="Aviso de ejecución local"
+          data-i18n-aria="localExecution"
+        >
+          <span class="trust-icon" aria-hidden="true">✳</span
+          ><span
+            ><strong data-i18n="localExecution">Ejecución local</strong
+            ><span class="banner-copy" data-i18n="localExecutionNotice"
+              >Tu programa se ejecuta en este equipo con tus permisos. No hay
+              aislamiento.</span
+            ></span
+          ><button
+            class="banner-dismiss"
+            id="banner-dismiss"
+            type="button"
+            aria-label="Cerrar aviso"
+            data-i18n-aria="dismissNotice"
+          >
+            ×
+          </button>
+        </section>
+
+        <p class="basic-hint" data-i18n="basicHint">
+          1. Pega tu código · 2. Crea el diagrama · 3. Explora el flujo
+        </p>
+
+        <section class="workspace-grid">
+          <section
+            class="editor-panel panel"
+            id="editor-panel"
+            aria-label="Editor de código"
+            data-i18n-aria="sourceEditor"
+          >
+            <div class="panel-heading editor-heading">
+              <div class="tab-title">
+                <span class="file-icon">⌘</span
+                ><span id="editor-tab-name" data-i18n="untitled"
+                  >Sin título</span
+                ><span
+                  class="tab-state"
+                  id="editor-tab-state"
+                  data-i18n="editing"
+                  >EDITANDO</span
+                >
+              </div>
+              <div class="editor-actions">
+                <button
+                  id="load-example"
+                  class="load-example-button"
+                  type="button"
+                  data-i18n="loadExample"
+                >
+                  Cargar ejemplo
+                </button>
+                <button
+                  class="icon-button"
+                  id="edit-source"
+                  type="button"
+                  title="Editar código"
+                  data-i18n-title="editSource"
+                  aria-label="Editar código"
+                  data-i18n-aria="editSource"
+                  hidden
+                >
+                  ✎</button
+                ><button
+                  class="icon-button"
+                  id="reset-source"
+                  type="button"
+                  title="Restaurar ejemplo"
+                  data-i18n-title="restoreExample"
+                  aria-label="Restaurar ejemplo"
+                  data-i18n-aria="restoreExample"
+                >
+                  ↺</button
+                ><span class="language-tag" id="editor-language">—</span>
+              </div>
+            </div>
+            <div class="editor-content" id="editor-content">
+              <div
+                class="line-gutter"
+                id="line-gutter"
+                aria-hidden="true"
+              ></div>
+              <textarea
+                class="source-editor"
+                id="source-editor"
+                disabled
+                placeholder="Pega aquí tu código…"
+                data-i18n-placeholder="pasteCode"
+                spellcheck="false"
+                aria-label="Código del programa"
+                data-i18n-aria="programCode"
+                autocapitalize="off"
+                autocomplete="off"
+              ></textarea>
+            </div>
+            <div
+              class="trace-source"
+              id="trace-source"
+              hidden
+              aria-label="Código de la traza"
+              data-i18n-aria="programSource"
+            >
+              <div
+                class="trace-gutter"
+                id="trace-gutter"
+                aria-hidden="true"
+              ></div>
+              <pre id="trace-code"></pre>
+            </div>
+            <div class="editor-footer">
+              <div class="editor-meta">
+                <span id="editor-position">Ln 1, Col 1</span
+                ><span class="meta-separator">·</span
+                ><span id="file-meta">Python</span
+                ><span class="meta-separator">·</span><span>UTF-8</span>
+              </div>
+              <div class="editor-footer-right">
+                <span id="source-state" data-i18n="ready">Listo</span
+                ><span class="save-indicator">●</span>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="inspector-panel panel"
+            aria-label="Opciones de ejecución"
+            data-i18n-aria="runSettings"
+          >
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow" data-i18n="configuration"
+                  >CONFIGURACIÓN</span
+                >
+                <h2 data-i18n="runSettings">Opciones de ejecución</h2>
+              </div>
+              <span class="settings-mark" aria-hidden="true">⚙</span>
+            </div>
+            <div class="settings-form">
+              <label
+                class="field-label"
+                for="entry-input"
+                data-i18n-text="entryPoint"
+                >Punto de entrada
+                <span class="optional" data-i18n="optional"
+                  >opcional</span
+                ></label
+              ><input
+                id="entry-input"
+                class="text-input"
+                autocomplete="off"
+                placeholder="Punto de entrada opcional"
+                data-i18n-placeholder="entryPlaceholder"
+                aria-label="Punto de entrada del programa"
+                data-i18n-aria="entryPoint"
+              />
+              <label
+                class="field-label"
+                for="args-input"
+                data-i18n-text="arguments"
+                >Argumentos
+                <span class="optional" data-i18n="optional"
+                  >opcional</span
+                ></label
+              ><input
+                id="args-input"
+                class="text-input"
+                autocomplete="off"
+                placeholder='["hello world"]'
+                data-i18n-placeholder="argumentsPlaceholder"
+                aria-label="Argumentos del programa"
+                data-i18n-aria="arguments"
+              />
+              <label
+                class="field-label"
+                for="stdin-input"
+                data-i18n-text="standardInput"
+                >Entrada estándar
+                <span class="optional" data-i18n="optional"
+                  >opcional</span
+                ></label
+              ><textarea
+                id="stdin-input"
+                class="stdin-input"
+                rows="2"
+                placeholder="Texto que leerá el programa…"
+                data-i18n-placeholder="stdinPlaceholder"
+                aria-label="Entrada estándar"
+                data-i18n-aria="standardInput"
+              ></textarea>
+              <span id="stdin-home"></span>
+              <div class="capability-head">
+                <span class="field-label" data-i18n="adapterCapabilities"
+                  >CAPACIDADES DEL ADAPTADOR</span
+                ><span
+                  id="adapter-state"
+                  class="adapter-state"
+                  data-i18n="loading"
+                  >Cargando</span
+                >
+              </div>
+              <div class="capability-list" id="capability-list">
+                <span class="capability-placeholder" data-i18n="connectFeatures"
+                  >Conéctate para ver las funciones compatibles</span
+                >
+              </div>
+              <p class="limitations" id="limitations"></p>
+              <label class="trust-check" id="trust-check-wrap"
+                ><input id="trust-check" type="checkbox" /><span
+                  class="check-box"
+                  aria-hidden="true"
+                ></span
+                ><span data-i18n="trustCode"
+                  >Confío en este código. Ejecutarlo localmente con mis
+                  permisos.</span
+                ></label
+              ><span id="trust-check-home"></span>
+              <div
+                class="security-caption"
+                id="security-caption"
+                data-i18n="onlyRunTrusted"
+              >
+                Ejecuta solo código en el que confíes. No hay aislamiento.
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section
+          class="diagram-panel panel"
+          aria-label="Diagrama UML de actividad"
+          data-i18n-aria="diagramTitle"
+          id="diagram-panel"
+        >
+          <div class="panel-heading diagram-heading">
+            <div>
+              <span class="eyebrow" data-i18n="staticDiagram"
+                >DIAGRAMA ESTÁTICO</span
+              >
+              <h2 data-i18n="diagramTitle">Diagrama UML</h2>
+            </div>
+            <div class="diagram-controls">
+              <label class="sr-only" for="diagram-type" data-i18n="diagramType"
+                >Tipo de diagrama</label
+              >
+              <select id="diagram-type" aria-label="Tipo de diagrama">
+                <option value="activity" data-i18n="activity">Actividad</option>
+                <option value="classes" data-i18n="classes">Clases</option>
+              </select>
+              <label class="sr-only" for="diagram-method" data-i18n="method"
+                >Método</label
+              >
+              <select id="diagram-method" aria-label="Método" hidden></select>
+              <button
+                id="diagram-generate"
+                class="run-button diagram-button"
+                type="button"
+                data-i18n="createDiagram"
+              >
+                Crear diagrama
+              </button>
+              <select
+                id="diagram-zoom"
+                aria-label="Ampliación del diagrama"
+                data-i18n-aria="diagramZoom"
+                disabled
+              >
+                <option value="fit" data-i18n="fitDiagram">Ajustar</option>
+                <option value="0.5">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1">100%</option>
+                <option value="1.25">125%</option>
+                <option value="1.5">150%</option>
+                <option value="2">200%</option>
+                <option value="3">300%</option>
+              </select>
+              <button
+                id="diagram-export-svg"
+                class="icon-button"
+                type="button"
+                title="Descargar SVG"
+                aria-label="Descargar SVG"
+                data-i18n-title="downloadDiagramSvg"
+                data-i18n-aria="downloadDiagramSvg"
+                disabled
+              >
+                ↓
+              </button>
+              <button
+                id="diagram-export-jpg"
+                class="icon-button"
+                type="button"
+                title="Descargar JPG"
+                aria-label="Descargar JPG"
+                data-i18n-title="downloadDiagramJpg"
+                data-i18n-aria="downloadDiagramJpg"
+                disabled
+              >
+                JPG
+              </button>
+            </div>
+          </div>
+          <div
+            id="diagram-stage"
+            class="diagram-stage"
+            role="group"
+            aria-label="El diagrama aparecerá aquí"
+            data-i18n-aria="diagramStage"
+          >
+            <div class="diagram-empty">
+              <strong data-i18n="diagramEmptyTitle"
+                >Pega tu código y crea un diagrama</strong
+              >
+              <p data-i18n="diagramEmptyText">
+                El análisis estático no ejecuta el programa.
+              </p>
+            </div>
+          </div>
+          <p
+            id="diagram-explanation"
+            class="diagram-explanation"
+            aria-live="polite"
+            data-i18n="diagramHelp"
+          >
+            El diagrama muestra la estructura del código; crearla no ejecuta el
+            programa.
+          </p>
+          <div id="diagram-warning" class="diagram-warning" hidden></div>
+        </section>
+
+        <details class="basic-run-disclosure" id="execution-options">
+          <summary data-i18n="runOptional">
+            Ver ejecución real (opcional)
+          </summary>
+          <p class="basic-run-note" data-i18n="runConsentNote">
+            La animación ejecuta el código localmente y requiere tu
+            consentimiento.
+          </p>
+          <div id="basic-run-content"></div>
+        </details>
+
+        <section class="lower-grid">
+          <section
+            class="timeline-panel panel"
+            aria-label="Reproducción de la traza"
+            data-i18n-aria="tracePlayback"
+          >
+            <div class="panel-heading timeline-heading">
+              <div>
+                <span class="eyebrow" data-i18n="executionTrace"
+                  >TRAZA DE EJECUCIÓN</span
+                >
+                <h2>
+                  <span data-i18n="timeline">Secuencia</span>
+                  <span class="event-count" id="event-count">0 events</span>
+                </h2>
+              </div>
+              <div class="timeline-actions">
+                <button
+                  class="icon-button"
+                  id="export-json"
+                  type="button"
+                  title="Descargar JSON de la traza"
+                  data-i18n-title="downloadTraceJson"
+                  aria-label="Descargar JSON de la traza"
+                  data-i18n-aria="downloadTraceJson"
+                  disabled
+                >
+                  ↓</button
+                ><button
+                  class="icon-button"
+                  id="export-svg"
+                  type="button"
+                  title="Descargar SVG del estado"
+                  data-i18n-title="downloadStateSvg"
+                  aria-label="Descargar SVG del estado"
+                  data-i18n-aria="downloadStateSvg"
+                  disabled
+                >
+                  ▧</button
+                ><button
+                  class="icon-button"
+                  id="export-html"
+                  type="button"
+                  title="Descargar visor sin conexión"
+                  data-i18n-title="downloadOfflineViewer"
+                  aria-label="Descargar visor sin conexión"
+                  data-i18n-aria="downloadOfflineViewer"
+                  disabled
+                >
+                  ▣
+                </button>
+              </div>
+            </div>
+            <div class="timeline-empty" id="timeline-empty">
+              <span class="empty-orbit" aria-hidden="true"><span></span></span
+              ><strong data-i18n="yourTrace">La traza aparecerá aquí</strong>
+              <p data-i18n="runToSeeSteps">
+                Ejecuta el programa para observar sus pasos.
+              </p>
+            </div>
+            <div class="timeline-content" id="timeline-content" hidden>
+              <div
+                class="event-strip"
+                id="event-strip"
+                role="list"
+                aria-label="Eventos de la traza"
+              ></div>
+              <div class="playback-controls">
+                <div class="transport">
+                  <button
+                    id="previous-button"
+                    class="transport-btn"
+                    type="button"
+                    title="Evento anterior"
+                    data-i18n-title="previousEvent"
+                    aria-label="Evento anterior"
+                    data-i18n-aria="previousEvent"
+                    disabled
+                  >
+                    ‹</button
+                  ><button
+                    id="play-button"
+                    class="play-toggle"
+                    type="button"
+                    aria-label="Reproducir"
+                    data-i18n-aria="play"
+                    disabled
+                  >
+                    ▶</button
+                  ><button
+                    id="next-button"
+                    class="transport-btn"
+                    type="button"
+                    title="Evento siguiente"
+                    data-i18n-title="nextEvent"
+                    aria-label="Evento siguiente"
+                    data-i18n-aria="nextEvent"
+                    disabled
+                  >
+                    ›</button
+                  ><button
+                    id="reset-button"
+                    class="transport-btn reset-transport"
+                    type="button"
+                    title="Reiniciar traza"
+                    data-i18n-title="resetTrace"
+                    aria-label="Reiniciar traza"
+                    data-i18n-aria="resetTrace"
+                    disabled
+                  >
+                    ↺
+                  </button>
+                </div>
+                <input
+                  id="seek-slider"
+                  class="seek-slider"
+                  type="range"
+                  min="0"
+                  max="0"
+                  value="0"
+                  aria-label="Avanzar por la traza"
+                  data-i18n-aria="seekTrace"
+                  disabled
+                /><label class="speed-control"
+                  ><span data-i18n="speed">Velocidad</span
+                  ><select
+                    id="speed-select"
+                    aria-label="Velocidad de reproducción"
+                    data-i18n-aria="speed"
+                  >
+                    <option value="0.5">0.5×</option>
+                    <option value="1" selected>1×</option>
+                    <option value="2">2×</option>
+                    <option value="4">4×</option>
+                  </select></label
+                ><span class="seek-count" id="seek-count">0 / 0</span>
+              </div>
+            </div>
+            <div class="trace-status" id="trace-status" hidden></div>
+          </section>
+          <section
+            class="state-panel panel"
+            id="state-panel"
+            aria-label="Estado del programa en el evento seleccionado"
+            data-i18n-aria="stateAtEvent"
+          >
+            <div class="panel-heading state-heading">
+              <div>
+                <span class="eyebrow" data-i18n="currentSnapshot"
+                  >ESTADO ACTUAL</span
+                >
+                <h2>
+                  <span data-i18n="programState">Estado del programa</span>
+                  <span class="before-badge" data-i18n="beforeLine"
+                    >ANTES DE LA LÍNEA</span
+                  >
+                </h2>
+              </div>
+              <span class="event-type" id="event-type">—</span>
+            </div>
+            <div class="state-content" id="state-content">
+              <div class="state-empty">
+                <span class="state-empty-icon">⌁</span
+                ><span data-i18n="stepToInspect"
+                  >Avanza por la traza para consultar el estado del
+                  programa.</span
+                >
+              </div>
+            </div>
+          </section>
+          <section
+            class="console-panel panel"
+            id="console-panel"
+            aria-label="Salida del programa"
+            data-i18n-aria="programOutput"
+          >
+            <div class="panel-heading console-heading">
+              <div>
+                <span class="eyebrow" data-i18n="programOutput"
+                  >SALIDA DEL PROGRAMA</span
+                >
+                <h2>
+                  <span data-i18n="console">Consola</span>
+                  <span class="console-live" id="console-live">IDLE</span>
+                </h2>
+              </div>
+              <button
+                id="clear-console"
+                class="icon-button"
+                type="button"
+                title="Borrar salida visible"
+                data-i18n-title="clearConsole"
+                aria-label="Borrar consola"
+                data-i18n-aria="clearConsole"
+                disabled
+              >
+                ⌫
+              </button>
+            </div>
+            <div class="console-content" id="console-content">
+              <div class="console-empty" data-i18n="outputAtStep">
+                La salida del paso seleccionado aparecerá aquí.
+              </div>
+            </div>
+          </section>
+        </section>
+        <div
+          class="alert-toast"
+          id="alert-toast"
+          role="alert"
+          aria-live="assertive"
+          hidden
+        >
+          <span class="alert-symbol">!</span><span id="alert-message"></span
+          ><button id="alert-close" type="button" aria-label="Cerrar error">
+            ×
+          </button>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

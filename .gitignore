@@ -1,0 +1,16 @@
+node_modules/
+.build/
+artifacts/
+playwright-report/
+test-results/
+__pycache__/
+*.pyc
+*.class
+.env
+.env.*
+!.env.example
+.codeflow.local.json
+.codeflow.local.*
+*.pem
+*.p12
+*.pfx

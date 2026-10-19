@@ -1,0 +1,35 @@
+{
+  "name": "codeflow-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Language-neutral, evidence-driven program execution studio",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "node src/cli.ts serve",
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs && node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src web tests scripts *.ts *.mjs *.json docs *.md skills .github",
+    "format:check": "prettier --check src web tests scripts *.ts *.mjs *.json docs *.md skills .github"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.0",
+    "typescript-eslint": "^8.71.2"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^3.1.1"
+  }
+}

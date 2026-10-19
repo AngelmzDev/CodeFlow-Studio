@@ -1,0 +1,43 @@
+[
+  {
+    "language": "python",
+    "filename": "sum.py",
+    "label": "Array sum · Python"
+  },
+  {
+    "language": "java",
+    "filename": "Main.java",
+    "entry": "Main",
+    "label": "Array sum · Java"
+  },
+  {
+    "language": "python",
+    "filename": "recursion.py",
+    "label": "Factorial · Python"
+  },
+  {
+    "language": "java",
+    "filename": "Recursion.java",
+    "entry": "Recursion",
+    "label": "Factorial · Java"
+  },
+  {
+    "language": "python",
+    "filename": "scanner_input.py",
+    "label": "Input · Python",
+    "stdin": "4\n3\n5\n8\n13\n"
+  },
+  {
+    "language": "java",
+    "filename": "Input.java",
+    "entry": "Input",
+    "label": "Input · Java",
+    "stdin": "5\n"
+  },
+  {
+    "language": "java",
+    "filename": "Objects.java",
+    "entry": "Objects",
+    "label": "References · Java"
+  }
+]
