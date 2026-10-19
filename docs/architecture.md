@@ -30,6 +30,12 @@ El CLI ofrece detección de entornos, servidor del estudio limitado a loopback, 
 
 El modo Básico abre con el editor vacío y ofrece **Cargar ejemplo**. La interfaz admite español e inglés, y conserva las preferencias de idioma y tema claro u oscuro. La descarga SVG produce un archivo del diagrama actual; la exportación de trazas también ofrece HTML y JSON.
 
+## Integración MCP
+
+`src/mcp` añade una capa de transporte y validación sobre los servicios existentes. No contiene analizadores, trazadores ni renderizadores alternativos: delega en `AdapterRegistry`, las visualizaciones, la explicación determinista y el exportador compartidos. El transporte `stdio` limita los mensajes, reserva `stdout` para JSON-RPC y devuelve resultados estructurados con procedencia explícita.
+
+Las herramientas MCP no aceptan rutas de lectura ni escritura. El análisis recibe fuente en memoria y las exportaciones devuelven contenido. La ejecución permanece cerrada salvo que el proceso se configure para aceptar permisos y encuentre un permiso local, breve, de un uso y ligado a la huella de la solicitud exacta. La concesión se crea en otra terminal; no puede sustituirse por un indicador dentro de la propia llamada MCP.
+
 ## Límites de ejecución
 
 Java usa Java Debug Interface (JDI) del JDK seleccionado y admite un archivo fuente, incluidas clases anidadas, con ejecución secuencial. Python usa `sys.settrace` para un único archivo objetivo y ejecución secuencial. Ambos adaptadores observan líneas; no prometen memoria a nivel de instrucción, resultados exactos de condiciones ni eventos por cada iteración. El entorno de ejecución determina qué variables locales y detalles de objetos están disponibles.
