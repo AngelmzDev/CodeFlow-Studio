@@ -115,15 +115,6 @@
             >
               Restaurar distribución
             </button>
-            <label class="select-wrap"
-              ><span class="lang-glyph" id="language-glyph">—</span
-              ><select
-                id="language-select"
-                aria-label="Idioma"
-                data-i18n-aria="language"
-              ></select
-              ><span class="select-caret">⌄</span></label
-            >
             <button
               class="tool-button"
               id="import-button"
@@ -192,7 +183,8 @@
         </section>
 
         <p class="basic-hint" data-i18n="basicHint">
-          1. Pega tu código · 2. Crea el diagrama · 3. Explora el flujo
+          1. Elige el lenguaje y pega tu código · 2. Crea el diagrama · 3.
+          Explora el flujo
         </p>
 
         <section class="workspace-grid">
@@ -246,6 +238,25 @@
                   ↺</button
                 ><span class="language-tag" id="editor-language">—</span>
               </div>
+            </div>
+            <div class="code-language-picker">
+              <label for="language-select" data-i18n="codeLanguage"
+                >Lenguaje de tu código</label
+              >
+              <div class="code-language-control">
+                <span class="lang-glyph" id="language-glyph" aria-hidden="true"
+                  >—</span
+                >
+                <select
+                  id="language-select"
+                  disabled
+                  aria-describedby="code-language-help"
+                ></select>
+              </div>
+              <p id="code-language-help" data-i18n="codeLanguageHelp">
+                Elige el lenguaje del código que vas a pegar. Cambiarlo conserva
+                tu texto.
+              </p>
             </div>
             <div class="editor-content" id="editor-content">
               <div

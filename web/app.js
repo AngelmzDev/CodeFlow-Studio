@@ -208,7 +208,10 @@ function visibleLanguageLabel(adapter, language) {
   return adapter?.label || language;
 }
 function updateAnalysisAvailability() {
-  const supported = !state.offline && state.adapter?.analysis === true;
+  const supported =
+    !state.offline &&
+    state.adapter?.available === true &&
+    state.adapter?.analysis === true;
   $('diagram-generate').disabled = !supported;
   if (!supported && !state.analysisCurrent)
     setText('diagram-explanation', t('noStaticAnalyzer', state.uiLanguage));
@@ -236,6 +239,7 @@ function renderLanguageMenu() {
   select.replaceChildren();
   nav.replaceChildren();
   const languages = [...new Set(state.adapters.map((a) => a.language))];
+  select.disabled = state.offline || !state.adapters.some((a) => a.available);
   if (!languages.length) {
     const option = document.createElement('option');
     option.value = '';
@@ -259,6 +263,8 @@ function renderLanguageMenu() {
     const option = document.createElement('option');
     option.value = lang;
     option.textContent = visibleLanguageLabel(adapter, lang);
+    if (adapter?.available === false)
+      option.textContent += ` — ${t('runtimeMissing', state.uiLanguage)}`;
     option.disabled = !!adapter && !adapter.available;
     select.append(option);
     const item = document.createElement('div');
@@ -280,7 +286,8 @@ function renderLanguageMenu() {
     nav.append(item);
   }
   if (!languages.includes(state.selectedLanguage))
-    state.selectedLanguage = languages[0];
+    state.selectedLanguage =
+      state.adapters.find((a) => a.available)?.language || languages[0];
   syncLanguage(state.selectedLanguage);
   setText('adapter-count', String(languages.length).padStart(2, '0'));
 }
@@ -1621,11 +1628,9 @@ function bind() {
     const stdin = $('stdin-input').value;
     state.selectedLanguage = e.target.value;
     syncLanguage(e.target.value);
-    if (dirty || document.documentElement.dataset.mode === 'basic') {
-      loadSource(source, filename, dirty, false, filenameExplicit);
-      $('entry-input').value = entry;
-      $('stdin-input').value = stdin;
-    } else restoreExample();
+    loadSource(source, filename, dirty, false, filenameExplicit);
+    $('entry-input').value = entry;
+    $('stdin-input').value = stdin;
     saveDraft();
   });
   $('load-example').addEventListener('click', restoreExample);

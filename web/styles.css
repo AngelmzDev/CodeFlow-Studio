@@ -539,6 +539,51 @@ button {
   background: var(--code-bg);
   overflow: hidden;
 }
+.code-language-picker {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.code-language-picker > label {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+.code-language-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.code-language-control select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--teal);
+  border-radius: 7px;
+  cursor: pointer;
+}
+.code-language-control select:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+.code-language-picker p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
 .line-gutter {
   width: 42px;
   flex: none;
@@ -2019,6 +2064,7 @@ textarea:focus-visible {
 }
 :root[data-mode='basic'] #import-button,
 :root[data-mode='basic'] #import-trace-button,
+:root[data-mode='basic'] #reset-source,
 :root[data-mode='basic'] .theme-toggle {
   display: none;
 }
@@ -2164,9 +2210,6 @@ textarea:focus-visible {
   padding: 4px 7px;
   font-size: 9px;
   cursor: pointer;
-}
-:root[data-mode='advanced'] #load-example {
-  display: none;
 }
 :root[data-theme='dark'] .load-example-button,
 :root[data-theme='dark'] .basic-run-disclosure summary {

@@ -76,13 +76,47 @@ test('basic Spanish flow creates a static UML diagram without running pasted cod
   await expect(page.locator('#diagram-export-jpg')).toBeDisabled();
 });
 
+test('language selection starts with an available runtime and explains disabled options', async ({
+  page,
+}) => {
+  await page.route('**/api/adapters', async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    data.adapters = data.adapters.map(
+      (adapter: { language: string; available: boolean }) =>
+        adapter.language === 'python'
+          ? { ...adapter, available: false }
+          : adapter,
+    );
+    await route.fulfill({ response, json: data });
+  });
+  await page.goto('/');
+  await expect(page.locator('#language-select')).toHaveValue('java');
+  await expect(
+    page.locator('#language-select option[value="python"]'),
+  ).toBeDisabled();
+  await expect(
+    page.locator('#language-select option[value="python"]'),
+  ).not.toHaveText('Python');
+  await expect(page.locator('#diagram-generate')).toBeEnabled();
+});
+
 test('pasting Java before selecting its language preserves source and displays class UML', async ({
   page,
 }) => {
   await page.goto('/');
   await expect(page.locator('#language-select option')).toHaveCount(2);
+  await expect(
+    page.getByLabel('Lenguaje de tu código', { exact: true }),
+  ).toBeVisible();
+  const selector = await page.locator('#language-select').boundingBox();
+  const editor = await page.locator('#source-editor').boundingBox();
+  expect(selector!.y + selector!.height).toBeLessThanOrEqual(editor!.y);
   await page.locator('#source-editor').fill(java);
   await page.locator('#language-select').selectOption('java');
+  await expect(page.locator('#source-editor')).toHaveValue(java);
+  await page.reload();
+  await expect(page.locator('#language-select')).toHaveValue('java');
   await expect(page.locator('#source-editor')).toHaveValue(java);
   await page.locator('#diagram-generate').click();
   await expect(page.locator('#diagram-stage svg')).toBeVisible();

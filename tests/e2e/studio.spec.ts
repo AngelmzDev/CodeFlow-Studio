@@ -109,10 +109,13 @@ test('runs the API examples in Python and Java and replays observed state', asyn
     lastPythonOutput,
   );
 
+  const preservedSource = await page.locator('#source-editor').inputValue();
   await page.locator('#language-select').selectOption('java');
+  await expect(page.locator('#source-editor')).toHaveValue(preservedSource);
   await expect(page.locator('#timeline-content')).toBeHidden();
   await expect(page.locator('#event-count')).toHaveText('0 events');
   await expect(page.locator('#console-content')).not.toContainText('20');
+  await page.locator('#load-example').click();
   await expect(page.locator('#source-editor')).toHaveValue(/public class Main/);
   const javaTrace = await localTrace(page);
   expect(javaTrace.language).toBe('java');

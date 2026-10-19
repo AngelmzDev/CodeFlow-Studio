@@ -10,7 +10,11 @@ const messages = {
     workspace: 'Espacio de trabajo',
     untitled: 'Sin título',
     loading: 'Cargando',
-    basicHint: '1. Pega tu código · 2. Crea el diagrama · 3. Explora el flujo',
+    basicHint:
+      '1. Elige el lenguaje y pega tu código · 2. Crea el diagrama · 3. Explora el flujo',
+    codeLanguage: 'Lenguaje de tu código',
+    codeLanguageHelp:
+      'Elige el lenguaje del código que vas a pegar. Cambiarlo conserva tu texto.',
     pythonLanguage: 'Python',
     javaLanguage: 'Java',
     localWorkspace: 'Espacio local',
@@ -195,7 +199,10 @@ const messages = {
     untitled: 'Untitled',
     loading: 'Loading',
     basicHint:
-      '1. Paste your code · 2. Create the diagram · 3. Explore the flow',
+      '1. Choose the language and paste your code · 2. Create the diagram · 3. Explore the flow',
+    codeLanguage: 'Code language',
+    codeLanguageHelp:
+      'Choose the language of the code you will paste. Changing it keeps your text.',
     pythonLanguage: 'Python',
     javaLanguage: 'Java',
     localWorkspace: 'Local workspace',

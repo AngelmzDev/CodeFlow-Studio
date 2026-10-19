@@ -5,7 +5,7 @@ CodeFlow Studio permite explorar la estructura de un programa y, de forma opcion
 ## Crear y explorar un diagrama
 
 1. Inicia la aplicación siguiendo las instrucciones de [instalación](../README.md#instalación-desde-el-código-fuente).
-2. En el modo **Básico**, selecciona Java o Python y escribe o pega el código en el editor. **Cargar ejemplo** inserta una muestra.
+2. En el modo **Básico**, usa **Lenguaje de tu código**, justo encima del editor, para seleccionar Java o Python. Después escribe o pega tu código. Cambiar el lenguaje conserva el texto; **Cargar ejemplo** lo sustituye por una muestra del lenguaje seleccionado. Los lenguajes sin un entorno disponible aparecen desactivados.
 3. Pulsa **Crear diagrama**. El análisis genera un diagrama de actividad; si el código Java declara clases, puedes consultar también el diagrama de clases.
 4. Usa los controles de zoom o mantén Ctrl mientras giras la rueda del ratón sobre el diagrama. Puedes descargarlo como SVG o JPG.
 
