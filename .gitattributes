@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.png -text -diff -merge -eol
+*.jpg -text -diff -merge -eol
+*.jpeg -text -diff -merge -eol
