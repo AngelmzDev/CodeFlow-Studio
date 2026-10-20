@@ -44,12 +44,10 @@ test('runs the API examples in Python and Java and replays observed state', asyn
 
   const languageOptions = page.locator('#language-select option');
   await expect(languageOptions).toHaveCount(2);
-  await expect(languageOptions).toContainText([
-    'Python · sys.settrace',
-    'Java · JDI',
-  ]);
+  await expect(languageOptions).toContainText(['Python', 'Java']);
   await expect(page.locator('#event-count')).toHaveText('0 events');
   await expect(page.locator('#timeline-content')).toBeHidden();
+  await page.locator('#load-example').click();
   await expect(page.locator('#source-editor')).toHaveValue(
     /numbers = \[4, 7, 9\]/,
   );
@@ -66,7 +64,7 @@ test('runs the API examples in Python and Java and replays observed state', asyn
       2,
     ),
   ).toEqual([]);
-  await page.locator('#theme-toggle').click();
+  await page.locator('#theme-select').selectOption('dark');
   const darkAxe = await new AxeBuilder({ page }).analyze();
   expect(
     darkAxe.violations,
@@ -79,7 +77,7 @@ test('runs the API examples in Python and Java and replays observed state', asyn
       2,
     ),
   ).toEqual([]);
-  await page.locator('#theme-toggle').click();
+  await page.locator('#theme-select').selectOption('light');
 
   await page.locator('#trust-check').check();
   const pythonTrace = await localTrace(page);
@@ -176,6 +174,7 @@ test('preserves spaces in JSON argument arrays during a real Python run', async 
   await page.goto('/');
   await page.locator('#language-select').selectOption('python');
   await page.locator('#source-editor').fill('import sys\nprint(sys.argv[1])\n');
+  await page.locator('#execution-options summary').click();
   await page.locator('#args-input').fill('["hello world"]');
   await page.locator('#trust-check').check();
   const trace = await localTrace(page);
@@ -233,6 +232,7 @@ test('imports a real CLI Java trace and exports an offline viewer without networ
 
     await page.goto('/');
     await page.locator('#language-select').selectOption('python');
+    await page.locator('.recording-options summary').click();
     await page.getByRole('button', { name: 'Import trace' }).click();
     await page.locator('#trace-file').setInputFiles(tracePath);
     await expect(page.locator('#language-select')).toHaveValue('java');
@@ -300,6 +300,7 @@ test('keeps controls reachable and prevents horizontal page overflow at 390px', 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Run trace' })).toBeVisible();
+  await page.locator('.recording-options summary').click();
   await expect(page.locator('#import-trace-button')).toBeVisible();
   await expect(page.locator('#language-select')).toBeVisible();
   const dimensions = await page.evaluate(() => ({

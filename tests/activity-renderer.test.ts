@@ -167,6 +167,114 @@ test('same-line loop operations receive a line-level highlight without selecting
   assert.equal(activityNodeForLine(loop, 3)?.id, 'a-init');
 });
 
+test('while-loop layout keeps entry before the nested body and preserves every edge deterministically', () => {
+  const loop: ActivityDiagram = {
+    id: 'nested-loop',
+    label: 'Nested loop',
+    startLine: 1,
+    endLine: 8,
+    warnings: [],
+    nodes: [
+      { id: 'start', kind: 'start', label: 'Start', line: 0 },
+      { id: 'init', kind: 'action', label: 'initialize', line: 1 },
+      {
+        id: 'loopDecision',
+        kind: 'decision',
+        label: 'while condition',
+        line: 2,
+      },
+      {
+        id: 'innerDecision',
+        kind: 'decision',
+        label: 'inner condition',
+        line: 3,
+      },
+      { id: 'action', kind: 'action', label: 'work', line: 4 },
+      { id: 'merge', kind: 'merge', label: 'Merge', line: 5 },
+      { id: 'exitMerge', kind: 'merge', label: 'Loop exit', line: 6 },
+      { id: 'output', kind: 'action', label: 'output', line: 7 },
+      { id: 'end', kind: 'end', label: 'End', line: 8 },
+    ],
+    edges: [
+      { id: 'start-init', from: 'start', to: 'init' },
+      { id: 'init-loop', from: 'init', to: 'loopDecision' },
+      {
+        id: 'loop-inner',
+        from: 'loopDecision',
+        to: 'innerDecision',
+        label: 'true',
+      },
+      {
+        id: 'inner-action',
+        from: 'innerDecision',
+        to: 'action',
+        label: 'true',
+      },
+      { id: 'inner-merge', from: 'innerDecision', to: 'merge', label: 'false' },
+      { id: 'action-merge', from: 'action', to: 'merge' },
+      { id: 'repeat', from: 'merge', to: 'loopDecision', label: 'repeat' },
+      {
+        id: 'loop-exit',
+        from: 'loopDecision',
+        to: 'exitMerge',
+        label: 'false',
+      },
+      { id: 'exit-output', from: 'exitMerge', to: 'output' },
+      { id: 'output-end', from: 'output', to: 'end' },
+    ],
+  };
+  const svg = renderActivitySvg(loop, { locale: 'en' });
+  assert.equal(svg, renderActivitySvg(loop, { locale: 'en' }));
+  assert.equal(
+    (svg.match(/marker-end="url\(#cf-arrow\)"/g) ?? []).length,
+    loop.edges.length,
+    'every input edge, including the back edge, must be routed',
+  );
+  assert.match(svg, />Repeat</);
+
+  const centerY = (id: string): number => {
+    const group = svg.match(
+      new RegExp(
+        `<g class="node-[^"]+" data-node-id="${id}"[^>]*>([\\s\\S]*?)</g>`,
+      ),
+    )?.[1];
+    assert.ok(group, `expected rendered node ${id}`);
+    const circle = group.match(/<circle cx="[\d.]+" cy="([\d.]+)"/);
+    if (circle) return Number(circle[1]);
+    const rect = group.match(
+      /<rect x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="([\d.]+)" rx="(?:10|2)"/,
+    );
+    if (rect) return Number(rect[1]) + Number(rect[2]) / 2;
+    const diamond = group.match(
+      /<path d="M [\d.]+ ([\d.]+) L [\d.]+ [\d.]+ L [\d.]+ ([\d.]+)/,
+    );
+    assert.ok(diamond, `expected node geometry for ${id}`);
+    return (Number(diamond[1]) + Number(diamond[2])) / 2;
+  };
+  const entryAndBody = ['start', 'init', 'loopDecision', 'innerDecision'].map(
+    centerY,
+  );
+  assert.ok(
+    entryAndBody.every(
+      (y, index) => index === 0 || entryAndBody[index - 1]! < y,
+    ),
+    'entry, initialization, outer condition, and inner condition must appear in order',
+  );
+});
+
+test('activity labels with long text are safely truncated without DOM APIs', () => {
+  const long = {
+    ...diagram,
+    nodes: nodes.map((node) =>
+      node.id === 'low' ? { ...node, label: 'long '.repeat(250) } : node,
+    ),
+  };
+  const svg = renderActivitySvg(long, { locale: 'en' });
+  assert.match(svg, /…/);
+  assert.equal(svg, renderActivitySvg(long, { locale: 'en' }));
+  assert.ok(svg.length < 30_000);
+});
+
 test('class diagram shows declared members and only resolved declared inheritance', () => {
   const classes: ClassInfo[] = [
     {

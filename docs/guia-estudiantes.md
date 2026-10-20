@@ -1,40 +1,26 @@
 # Guía para estudiantes
 
-CodeFlow Studio permite explorar la estructura de un programa y, de forma opcional, observar una ejecución real. Puedes empezar con análisis estático: no ejecuta el código ni requiere aceptar el consentimiento de ejecución.
+CodeFlow Studio presenta el trabajo en tres apartados: **Código**, **Diagrama** y **Paso a paso**. Puedes estudiar primero la estructura estática; crear un diagrama no ejecuta el programa ni requiere aceptar el consentimiento de ejecución.
 
-## Crear y explorar un diagrama
+## Código
 
-1. Inicia la aplicación siguiendo las instrucciones de [instalación](../README.md#instalación-desde-el-código-fuente).
-2. En el modo **Básico**, usa **Lenguaje de tu código**, justo encima del editor, para seleccionar Java o Python. Después escribe o pega tu código. Cambiar el lenguaje conserva el texto; **Cargar ejemplo** lo sustituye por una muestra del lenguaje seleccionado. Los lenguajes sin un entorno disponible aparecen desactivados.
-3. Pulsa **Crear diagrama**. El análisis genera un diagrama de actividad; si el código Java declara clases, puedes consultar también el diagrama de clases.
-4. Usa los controles de zoom o mantén Ctrl mientras giras la rueda del ratón sobre el diagrama. Puedes descargarlo como SVG o JPG.
+Escribe o pega código Java o Python, importa un archivo o carga un ejemplo. Importar y editar no ejecuta código. Los lenguajes disponibles dependen de los entornos instalados. Usa **Ctrl+Enter** para crear un diagrama y **Ctrl+Shift+Enter** para iniciar una ejecución; esta última acción mantiene el consentimiento explícito.
 
-El diagrama representa estructura sintáctica, como ramas y bucles. No ejecuta instrucciones, no calcula expresiones y no decide qué rama se tomaría con unos datos concretos. En Java se representan las alternativas de expresiones ternarias y de `switch` con flechas (`case ... ->`). El `switch` con etiquetas `case:` y las expresiones `switch` se muestran como pasos opacos. Otras construcciones que quedan fuera del subconjunto compatible también pueden aparecer como opacas o acompañadas de avisos.
+## Diagrama
 
-## Observar una ejecución
+El diagrama de actividad muestra estructura posible, como ramas y bucles. No calcula expresiones ni decide qué rama tomarían unos datos concretos. En Java se representan las alternativas de expresiones ternarias y de `switch` con flechas (`case ... ->`). El `switch` con etiquetas `case:` y las expresiones `switch` se muestran como pasos opacos. Otras construcciones fuera del subconjunto compatible también pueden aparecer como opacas o acompañadas de avisos. Java con clases permite consultar también el diagrama de clases.
 
-La ejecución es opcional. El modo **Avanzado** permite generar una traza; en el modo Básico también se puede abrir la sección **Ver ejecución real (opcional)**. Lee y acepta el consentimiento antes de iniciar: el código se ejecutará en tu equipo con los permisos de tu usuario. Ejecuta únicamente código de confianza.
+Usa los controles de zoom y descarga el diagrama como SVG o JPG.
 
-Java se traza mediante JDI y Python mediante `sys.settrace`. Una parada registra la ubicación **antes** de la instrucción indicada. Por eso, los cambios que provoca suelen aparecer en la instantánea siguiente. La reproducción permite recorrer instantáneas ya registradas hacia delante y hacia atrás; retroceder no vuelve a ejecutar el programa.
+## Paso a paso
 
-La ejecución Java compila con `--enable-preview` y la versión del JDK detectado.
+La ejecución es opcional. Lee y acepta el consentimiento antes de iniciar: el programa corre en tu equipo con los permisos de tu usuario. Ejecuta únicamente código de confianza. Los campos de entrada, argumentos y clase de entrada están plegados bajo **Entrada y opciones**; puedes dejarlos cerrados si no los necesitas.
 
-Al explorar una traza:
+Java se traza mediante JDI y Python mediante `sys.settrace`. La ejecución Java compila con `--enable-preview` y la versión del JDK detectado. Una parada registra la ubicación **antes** de la instrucción indicada. Por eso, los cambios que provoca suelen aparecer en la instantánea siguiente. Los controles de reproducción recorren instantáneas ya registradas; retroceder no vuelve a ejecutar el programa ni permite modificar variables durante la ejecución.
 
-- Distingue los datos observados durante la ejecución de los cambios y diagramas derivados por la interfaz.
-- Interpreta una línea resaltada como la instrucción que está a punto de ejecutarse, no como prueba de que una condición sea verdadera.
-- El diagrama de secuencia se construye solo con llamadas y retornos presentes en la traza hasta el paso seleccionado. Si un evento no se observó, el diagrama no lo deduce del texto fuente.
-- Ten en cuenta que la información disponible depende del lenguaje y del entorno: algunas variables, objetos o detalles pueden no estar presentes.
-- Si la traza está marcada como parcial, se alcanzó un límite de observación y no se registró toda la ejecución.
-- Puedes descargar la traza en JSON o exportar un SVG del estado seleccionado y un HTML autocontenido que se abre sin conexión. Revisa el contenido antes de compartirlo: puede incluir código fuente, valores y salida.
+El apartado reúne la línea actual, variables y cambios observados, la explicación didáctica y la salida de consola. Distingue los datos observados de las vistas derivadas por la interfaz. Una línea resaltada es la instrucción a punto de ejecutarse, no prueba de que una condición sea verdadera. Algunas variables, objetos o detalles pueden faltar según el lenguaje y el entorno. Una traza marcada como parcial alcanzó un límite de observación.
 
-La ejecución local no está aislada. Los límites de tiempo, eventos, memoria y salida son salvaguardas de mejor esfuerzo. Consulta [Seguridad](../SECURITY.md) y la [guía de usuario](user-guide.md) para más información sobre alcance, controles y solución de problemas.
-
-## Explicación y organización del espacio de trabajo
-
-El panel de explicación sigue el paso seleccionado y ofrece una explicación determinista en español o inglés, en modo breve o detallado. Muestra por separado la evidencia observada y las notas que explican sus límites. Una instantánea anterior a una instrucción no demuestra qué resultado tendrá esa instrucción.
-
-Puedes activar la explicación adicional con IA local si añades el bloque `ai` a `.codeflow.local.json`. El siguiente valor de `model` es solo un ejemplo: sustitúyelo por el nombre exacto de un modelo que ya esté instalado. No hace falta descargar ningún modelo para usar CodeFlow Studio.
+La explicación determinista sigue disponible. Puedes abrir sus detalles para cambiar entre nivel breve y detallado o activar una explicación adicional de IA local. El texto generado por IA se etiqueta aparte, puede contener errores y no sustituye los datos observados. Para usar Ollama configura en `.codeflow.local.json` un modelo que ya esté instalado:
 
 ```json
 {
@@ -46,8 +32,8 @@ Puedes activar la explicación adicional con IA local si añades el bloque `ai` 
 }
 ```
 
-CodeFlow Studio se comunica con el endpoint local de chat de Ollama. Consulta la [documentación oficial de la API de chat](https://docs.ollama.com/api/chat). En esta máquina no hay un modelo local configurado; la integración se ha comprobado con un servidor simulado. La calidad con un modelo real requiere un modelo instalado y validación con ese modelo. El texto generado por IA se etiqueta aparte, puede contener errores y no sustituye a los datos observados. Si Ollama no está disponible, puedes seguir usando la explicación determinista.
+Sustituye el nombre de ejemplo por el de tu modelo. No necesitas IA para usar la aplicación; si Ollama no está disponible, puedes seguir usando la explicación determinista. La integración se ha comprobado con un servidor simulado; el comportamiento real depende del modelo instalado.
 
-Puedes reordenar los paneles de consola, estado, secuencia y explicación; redimensionar todos esos paneles y también el editor y el diagrama estático; y restaurar la disposición predeterminada. Las preferencias de tamaño y orden se guardan localmente.
+Abre **Guardar o abrir una ejecución** para importar una traza o descargarla como JSON, guardar el estado seleccionado como SVG o exportar HTML autocontenido que se abre sin conexión. Revisa cualquier exportación antes de compartirla: puede incluir código fuente, valores y salida.
 
-CodeFlow Studio continúa en desarrollo activo. Se incorporarán nuevas funcionalidades, mejoras de visualización, optimizaciones y herramientas educativas en futuras versiones.
+La ejecución local no está aislada. Los límites de tiempo, eventos, memoria y salida son salvaguardas de mejor esfuerzo. Consulta [Seguridad](../SECURITY.md) y la [guía de usuario](user-guide.md) para más información sobre alcance y solución de problemas.

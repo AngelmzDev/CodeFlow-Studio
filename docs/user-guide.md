@@ -1,36 +1,34 @@
 # Guía de usuario
 
-Inicia el estudio con `npm start` y abre la dirección local que imprime el CLI. No necesitas una cuenta en la nube ni un proveedor de IA.
+Inicia el estudio con `npm start` y abre la dirección local que imprime el CLI. No necesitas una cuenta en la nube ni un proveedor de IA. La interfaz tiene tres apartados: **Código**, **Diagrama** y **Paso a paso**.
 
-## Crear un diagrama estático
+## Código
 
-1. El modo **Básico** está seleccionado al abrir el estudio y el editor empieza vacío. Selecciona Python o Java y pega o escribe el código. También puedes pulsar **Cargar ejemplo** para insertar una muestra.
-2. Pulsa **Crear diagrama**. CodeFlow Studio analiza la sintaxis del archivo, sin ejecutar el programa. Para Java que contiene clases, puedes elegir el diagrama de actividad de cada método y consultar el diagrama de clases.
-3. Revisa la estructura. El diagrama de actividad representa un subconjunto de `if`, bucles, `return`, `break` y `continue`. No calcula condiciones ni predice qué camino se tomará al ejecutar. Las construcciones no compatibles aparecen como elementos opacos; la interfaz puede mostrar avisos.
-4. Pulsa **Descargar SVG** para guardar el diagrama mostrado. La interfaz puede cambiar entre español e inglés y entre tema claro y oscuro; esas preferencias se conservan.
+El editor comienza vacío. Selecciona Java o Python, escribe o pega la fuente, impórtala desde un archivo o pulsa **Cargar ejemplo**. Importar y editar no ejecutan código. La disponibilidad del análisis y la ejecución depende de los entornos detectados. Pulsa **Crear diagrama** o usa Ctrl+Enter para analizar la fuente sin ejecutarla. Usa Ctrl+Shift+Enter para solicitar una ejecución con consentimiento.
 
-El análisis usa `ast.parse` de Python o `JavacTask.parse` de Java para obtener la estructura sintáctica. La interfaz presenta ramas posibles del código. Una línea destacada en este modo está asociada a la estructura del diagrama, no es evidencia de ejecución.
+## Diagrama
 
-## Observar una ejecución real
+El análisis genera un diagrama de actividad y, para Java con clases, permite consultar también el diagrama de clases. El diagrama estático representa un subconjunto de `if`, bucles, `return`, `break` y `continue`. No calcula condiciones ni predice qué camino se tomará durante la ejecución. Las construcciones no compatibles aparecen como elementos opacos; la interfaz puede mostrar avisos.
 
-El modo **Avanzado** conserva la vista de trazas. En **Básico**, puedes desplegar **Ver ejecución real (opcional)** para iniciar ese flujo. Antes de ejecutar, lee y acepta el consentimiento: el programa se ejecutará localmente con los permisos de tu sistema operativo.
+La interfaz permite ajustar el zoom y descargar el diagrama como SVG o JPG. Los diagramas usan Dagre y ajustan su geometría al contenido representado.
 
-1. Selecciona un lenguaje instalado. La disponibilidad y las capacidades dependen del adaptador detectado.
-2. Importa o edita una fuente de un solo archivo. En Java, el nombre del archivo debe coincidir con la clase pública; la entrada opcional es el nombre completo de la clase. Importar y editar por sí mismos no ejecutan código.
-3. Los argumentos se proporcionan como una matriz JSON de cadenas, por ejemplo `["hola", "42"]`. La entrada estándar se suministra por adelantado y termina en EOF al consumirse; no hay terminal interactiva.
-4. Revisa la fuente, acepta el consentimiento de ejecución local y pulsa **Animar ejecución**. Los límites de tiempo y tamaño restringen la observación, pero no aíslan el programa.
-5. Usa Siguiente/Anterior, la tira de eventos o el control deslizante para recorrer la traza. Una línea resaltada marca la instrucción a punto de ejecutarse. Sus efectos suelen aparecer en la instantánea siguiente. Una salida de método incluye su estado final y, si está disponible, el valor devuelto.
-6. Reproducir, pausar y cambiar la velocidad solo controlan la reproducción de eventos ya grabados. Ir hacia atrás no vuelve a ejecutar el programa. Las flechas navegan fuera de los editores y la barra espaciadora activa o pausa la reproducción.
-7. Las variables y referencias son observaciones del tiempo de ejecución. Los cambios y la disposición del diagrama son derivados. Las vistas de matrices y objetos son instantáneas acotadas, no un visor de toda la memoria. La traza no promete resultados exactos de condiciones ni eventos por cada iteración.
-8. Puedes exportar HTML interactivo y autocontenido para abrirlo sin conexión, SVG del estado seleccionado o JSON para conservar e importar la traza. El HTML incluye fuente, valores y salida; revísalo antes de compartirlo.
+## Paso a paso
 
-Una traza limitada se marca como parcial. La interfaz acota la ventana de eventos, las vistas previas, los campos, las cadenas, los marcos, la salida y el tamaño total de la traza. Una traza parcial no representa una ejecución completa.
+La ejecución requiere aceptar el consentimiento antes de iniciar; el programa se ejecuta localmente con los permisos del sistema operativo. Solo ejecútalo con código de confianza. Los campos de entrada estándar, argumentos y clase de entrada están plegados bajo **Entrada y opciones**. Java admite una fuente de un solo archivo; el nombre del archivo debe coincidir con la clase pública. La clase de entrada, si hace falta, se indica en las opciones. Los argumentos son una matriz JSON de cadenas, por ejemplo `["hola", "42"]`. La entrada estándar se proporciona por adelantado y termina en EOF al consumirse; no hay una terminal interactiva.
 
-## Alcance
+Una ubicación de traza se registra **antes** de la instrucción indicada. Sus efectos suelen aparecer en la instantánea siguiente. Siguiente, Anterior, la tira de eventos y el control deslizante recorren instantáneas registradas. Reproducir, pausar y cambiar la velocidad controlan esa reproducción; retroceder no vuelve a ejecutar el programa. Las flechas navegan fuera de los editores y la barra espaciadora activa o pausa.
 
-Solo Java y Python tienen adaptadores operativos. La ejecución se limita a programas secuenciales de un archivo fuente. Los diagramas estáticos interpretan un subconjunto de estructuras; no ejecutan ni evalúan expresiones. Los directorios de proyecto, la edición de varios archivos, los puntos de interrupción y la modificación de variables en vivo quedan fuera del alcance actual.
+El apartado agrupa la línea actual, variables y cambios, explicación didáctica y consola. Las variables y referencias son observaciones del tiempo de ejecución. Los cambios y la disposición del diagrama son derivados. Las vistas de matrices y objetos son instantáneas acotadas, no un visor de toda la memoria. La traza no promete resultados exactos de condiciones ni eventos por cada iteración. Una traza limitada se marca como parcial.
 
-## Solución de problemas
+La explicación determinista se adapta al paso seleccionado. En sus detalles puedes cambiar el nivel breve o detallado y activar una explicación adicional con IA local. La IA es opcional, puede contener errores y se etiqueta aparte de los hechos observados; si Ollama no está disponible, se conserva la explicación determinista.
+
+Bajo **Guardar o abrir una ejecución** puedes importar una traza y descargarla como JSON, guardar el SVG del estado seleccionado o exportar HTML interactivo autocontenido para abrirlo sin conexión. El HTML incluye fuente, valores y salida; revisa el contenido antes de compartirlo.
+
+La ejecución acota la ventana de eventos, las vistas previas, campos, cadenas, marcos, salida y tamaño total de la traza. No proporciona depuración interactiva con modificación de variables ni una sesión de entrada por terminal. La ejecución local no está aislada; sus límites son salvaguardas de mejor esfuerzo.
+
+## Alcance y solución de problemas
+
+Solo Java y Python tienen adaptadores operativos. La ejecución se limita a programas secuenciales de un archivo fuente. Los diagramas estáticos interpretan un subconjunto de estructuras y no evalúan expresiones. Los directorios de proyecto, la edición de varios archivos, los puntos de interrupción y la modificación de variables en vivo quedan fuera del alcance actual.
 
 - **Falta el entorno de ejecución:** ejecuta `node src/cli.ts doctor`. Configura `CODEFLOW_JAVA_HOME`/`JAVA_HOME` o `CODEFLOW_PYTHON` y reinicia el servicio.
 - **Error de sintaxis:** revisa el aviso del analizador y la línea indicada. Para Java, confirma también que el nombre del archivo coincide con la clase pública.

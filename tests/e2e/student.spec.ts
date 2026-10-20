@@ -33,7 +33,7 @@ test('basic Spanish flow creates a static UML diagram without running pasted cod
   });
   await page.goto('/');
   await expect(page.locator('#source-editor')).toHaveValue('');
-  await expect(page.locator('#mode-select')).toHaveValue('basic');
+  await expect(page.locator('#layout-board > section')).toHaveCount(3);
   await expect(page.locator('#ui-language')).toHaveValue('es');
   await expect(page.locator('.inspector-panel')).toBeHidden();
   await expect(page.locator('#execution-options')).not.toHaveAttribute(
@@ -198,6 +198,7 @@ test('optional real animation highlights observed lines and survives offline exp
   const dir = await mkdtemp(join(tmpdir(), 'codeflow-student-offline-'));
   try {
     const downloadEvent = page.waitForEvent('download');
+    await page.locator('.recording-options summary').click();
     await page.locator('#export-html').click();
     const download = await downloadEvent;
     const path = join(dir, 'student.html');
@@ -212,7 +213,6 @@ test('optional real animation highlights observed lines and survives offline exp
     await offline.goto(pathToFileURL(path).href);
     await expect(offline.locator('#diagram-stage svg')).toBeVisible();
     await expect(offline.locator('#timeline-content')).toBeVisible();
-    await offline.locator('#mode-select').selectOption('advanced');
     await offline.locator('#ui-language').selectOption('en');
     await expect(offline.locator('#alert-toast')).toBeHidden();
     expect(errors).toEqual([]);

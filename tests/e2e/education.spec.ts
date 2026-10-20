@@ -30,7 +30,7 @@ test('education panels follow a real Python trace backwards and cache optional A
       el.dispatchEvent(new Event('input', { bubbles: true }));
     }, index);
   await expect(page.locator('#explanation-panel')).toBeVisible();
-  await expect(page.locator('#sequence-panel')).toBeVisible();
+  await expect(page.locator('#sequence-panel')).toBeHidden();
   await expect(page.locator('#explanation-content')).toHaveAttribute(
     'data-index',
     String(index),
@@ -63,6 +63,7 @@ test('education panels follow a real Python trace backwards and cache optional A
       },
     });
   });
+  await page.locator('.explanation-options summary').click();
   await page.locator('#explanation-ai').check();
   await expect(page.locator('.explanation-generated')).toContainText(
     '<script>sin ejecutar</script>',

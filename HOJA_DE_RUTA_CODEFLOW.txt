@@ -1,0 +1,64 @@
+CODEFLOW STUDIO — HOJA DE RUTA Y PUNTO DE REANUDACIÓN
+Fecha: 20/10/2026
+Repositorio: E:\DAM\GithubRepositories\CodeFlow-Studio
+Baseline de trabajo: e6f45b7
+Petición: producto sencillo, elegante y funcional para estudiantes con tres apartados: Código, Diagrama y Paso a paso. Copia entregable: C:\Users\zerozeid\Documents\Codex\2026-10-20\ana\outputs\HOJA_DE_RUTA_CODEFLOW.txt.
+
+ESTADO INICIAL
+La aplicación local Node >=24, JavaScript DOM sin React, TypeScript en núcleo; esbuild. Java JDI y Python sys.settrace producen trazas reales. Interfaz ES/EN y claro/oscuro. Antes de cambiar el producto se creó esta hoja de ruta y su copia entregable. El diseño previo tenía modos básico/avanzado, paneles reordenables y geometría de diagramas que necesitaba ajustes.
+
+MAPA DE ARCHIVOS PARA REANUDAR
+- `web/layout.js`: composición de las tres secciones, controles secundarios plegados y navegación.
+- `web/app.js`: flujo de interacción, estado, renderizado, ejecución y reproducción.
+- `web/styles.css`: diseño adaptable, disposición, temas y estilos de las secciones.
+- `src/visualization/activity.ts`: renderizador Dagre, recorrido DFS sin greedy y geometría de nodos, etiquetas y conectores.
+- `tests/activity-renderer.test.ts`: regresiones de geometría y renderizado de diagramas.
+- `tests/e2e/*.spec.ts`: pruebas de flujo de interfaz y validación E2E.
+- `README.md`, `docs/guia-estudiantes.md`, `docs/user-guide.md`: documentación del flujo actual.
+- `HOJA_DE_RUTA_CODEFLOW.txt`: decisiones, fases y estado para la siguiente reanudación.
+
+DECISIONES DE PRODUCTO
+1. Tres apartados visibles y adaptables: Código, Diagrama y Paso a paso. Sin modos básico/avanzado ni reordenación de paneles.
+2. En Código: lenguaje, pegar/importar, ejemplos y editor con línea resaltada durante reproducción.
+3. En Diagrama: análisis estático, selector de método/tipo cuando proceda, zoom y exportación.
+4. En Paso a paso: consentimiento de ejecución local, reproducción, línea actual, variables/cambios, explicación y consola. Entrada, argumentos y clase de entrada se pliegan bajo opciones; el detalle de explicación y la IA opcional permanecen secundarios.
+5. Importar una traza y sus exportaciones están bajo «Guardar o abrir una ejecución».
+6. Ctrl+Enter crea un diagrama; Ctrl+Shift+Enter inicia la ejecución con consentimiento.
+7. Mantener semántica: la instantánea se captura antes de la línea actual; los efectos de esa instrucción aparecen en la siguiente. La reproducción recorre datos registrados; no constituye ejecución interactiva.
+8. Mantener el motor Dagre y mejorar geometría SVG, sin cambiar el motor.
+
+FASES Y ESTADO
+[x] A. Guardar esta hoja en el repositorio y su copia entregable antes de los cambios del producto.
+[x] B. Integrar los tres apartados adaptables, simplificar navegación y plegar opciones secundarias.
+[x] C. Mejorar geometría/renderizador con figuras dimensionadas por contenido, decisiones y conectores legibles; conservar Dagre.
+[x] D. Integrar el depurador y conservar sincronía de código, valores, explicación y salida, con reproducción hacia delante y atrás según instantáneas grabadas.
+[x] E. Actualizar pruebas de interfaz y documentación al nuevo producto; captura principal renovada al terminar QA.
+[x] F. QA completada: typecheck, lint, formato, unitarias e integración, E2E y revisión visual en escritorio/móvil y claro/oscuro.
+[x] G. Resultados y mapa de archivos registrados. Cambios locales terminados, sin commit ni publicación.
+
+VERIFICACIÓN FINAL — 20/10/2026
+- npm run check: correcto. Typecheck, lint, formato y 86 pruebas unitarias/de integración aprobadas.
+- npx playwright test: 13/13 aprobadas sobre la última versión.
+- Validado Java y Python reales, entrada/argumentos, importación, valores al avanzar y retroceder, análisis estático sin ejecución, exportaciones SVG/JPG y visor offline sin peticiones de red.
+- Comprobado contraste con axe en claro/oscuro, anchos 1440/1024/390/320, persistencia del borrador y ausencia de errores JavaScript en el recorrido principal.
+- Revisión visual escritorio, oscuro y móvil; rombos con texto contenido, inicio encima del cuerpo del bucle y resaltado conservado al cambiar tema.
+- Captura final: docs/screenshots/studio.png; copia entregable outputs/CodeFlow-redisenado.png.
+- Delegadas a dos agentes gpt-6-luna la documentación y las regresiones/revisión para ahorrar recursos, según petición del usuario.
+
+MAPA DE ARCHIVOS PARA RETOMAR
+web/layout.js: composición de las tres secciones y agrupación de controles.
+web/app.js: editor, API, reproducción, valores, resaltado y zoom.
+web/styles.css: diseño adaptable, temas y legibilidad.
+src/visualization/activity.ts: Dagre DFS sin greedy, geometría de nodos y conexión a rombos/círculos.
+tests/activity-renderer.test.ts: regresiones de diagramas, bucles y texto largo.
+tests/e2e/*.spec.ts: recorridos de interfaz, Java/Python, accesibilidad y exportación.
+README.md, docs/guia-estudiantes.md, docs/user-guide.md: documentación actualizada.
+
+LÍMITES QUE SE CONSERVAN
+Sólo Java/Python y programas secuenciales de un archivo según los adaptadores. La reproducción usa instantáneas ya registradas, no puntos de interrupción ni edición de variables en vivo. Los diagramas complejos requieren zoom o desplazamiento; los analizadores siguen indicando construcciones no soportadas. La IA local es opcional; probada con simulación, no se ha configurado un modelo real.
+
+REANUDAR
+No quedan fases de implementación ni validación pendientes para este rediseño. Leer este archivo y git diff --stat / git status antes de cambios nuevos. Baseline e6f45b7; cambios siguen sin commit. Usar el mapa de archivos para consultar sólo la parte afectada. Para arrancar: npm start desde el repositorio (bundle .build ya actualizado). No repetir análisis completo del repositorio.
+
+PUBLICACIÓN AUTORIZADA — 20/10/2026
+El usuario ha pedido subir los cambios a GitHub y sustituir la imagen antigua. Portada docs/images/codeflow-cover.png reemplazada por la captura nueva de los tres apartados; README muestra una única imagen actual. Destino autorizado: origin/main. Los cambios se agrupan en el commit de rediseño de los tres apartados; consultar git log y origin/main para verificar la publicación.

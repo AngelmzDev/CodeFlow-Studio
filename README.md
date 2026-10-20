@@ -1,40 +1,32 @@
-![Portada de CodeFlow Studio](docs/images/codeflow-cover.png)
-
 # CodeFlow Studio
 
-CodeFlow Studio es una herramienta local y de código abierto para aprender cómo se organiza un programa y qué ocurre cuando se ejecuta. Permite analizar código Java y Python para generar diagramas UML estáticos y, cuando se solicita expresamente, observar y reproducir una ejecución real.
+CodeFlow Studio es una herramienta local y de código abierto para que estudiantes exploren cómo se organiza un programa y qué ocurre durante su ejecución. La interfaz se organiza en tres apartados: **Código**, **Diagrama** y **Paso a paso**. Analiza programas Java y Python para mostrar diagramas estáticos y, cuando se solicita expresamente, puede registrar y reproducir una ejecución local.
 
-## ¿A quién puede servirle?
+![Código, diagrama y ejecución paso a paso](docs/images/codeflow-cover.png)
 
-- **Estudiantes y personas autodidactas:** para relacionar cada línea de código con el flujo, las variables y la salida del programa.
-- **Docentes:** para explicar en clase condiciones, bucles, llamadas y estados observados con ejemplos propios.
-- **Desarrolladores que están aprendiendo Java o Python:** para explorar programas pequeños y entender su ejecución paso a paso.
+## Explora tu programa
 
-El análisis estático es útil para estudiar la estructura sin ejecutar el código. Para generar una traza, utiliza únicamente programas de confianza: se ejecutan en tu propio ordenador con tus permisos.
+En **Código**, escribe o pega una fuente, importa un archivo o carga un ejemplo. En **Diagrama**, crea una vista estática de la actividad; Java también permite consultar clases. En **Paso a paso**, puedes aceptar el consentimiento y observar una ejecución, con sus variables, explicación y consola. Las opciones de entrada, argumentos y clase de entrada están plegadas dentro de ese apartado. La ejecución requiere consentimiento explícito y utiliza los permisos de tu equipo, así que ejecútala solo con código de confianza.
 
-En el modo **Básico**, pega o escribe código para crear un diagrama de actividad sin ejecutar el programa. Para Java con clases también está disponible el diagrama de clases. El modo **Avanzado** permite ejecutar localmente y explorar las trazas observadas. La ejecución requiere consentimiento explícito. La interfaz ofrece español e inglés, tema claro u oscuro, zoom del diagrama con Ctrl y la rueda del ratón, y exportación de diagramas a SVG o JPG.
-
-![Ejecución real de Java con matrices observadas y reproducción sincronizada](docs/screenshots/studio.png)
+Usa **Ctrl+Enter** para crear el diagrama y **Ctrl+Shift+Enter** para ejecutar. La ejecución conserva su consentimiento previo. Los diagramas estáticos no ejecutan ni evalúan el código. En una traza, cada instantánea se toma **antes** de la instrucción indicada; los efectos de esa instrucción aparecen en la siguiente. La reproducción recorre las instantáneas registradas, no vuelve a ejecutar el programa.
 
 ## Funciones disponibles
 
-- Análisis estático de Java y Python para generar diagramas de actividad; en Java, también diagramas de clases.
+- Análisis estático de Java y Python para diagramas de actividad; Java también ofrece diagramas de clases.
 - En Java, expansión estática de expresiones ternarias y `switch` con flechas (`case ... ->`); las formas `case:` y las expresiones `switch` se muestran como pasos opacos.
 - Trazado real de Java mediante Java Debug Interface (JDI) y de Python mediante `sys.settrace`.
 - La ejecución Java compila con `--enable-preview` y la versión del JDK detectado.
 - Reproducción de eventos y estados observados, con vistas de variables, pila de llamadas, salida, matrices y objetos cuando el adaptador puede observarlos.
-- Explicación didáctica determinista en español e inglés, con niveles breve y detallado, sincronizada con el paso seleccionado.
-- Diagrama de secuencia basado únicamente en llamadas y retornos observados en la traza; no se inventan llamadas a partir del código fuente.
-- Distribución ajustable: redimensiona los paneles y reordena consola, estado, secuencia y explicación. La disposición se guarda localmente y se puede restaurar.
-- Exportación de diagramas como SVG o JPG y de trazas como JSON, SVG o HTML autocontenido que se puede abrir sin conexión.
-
-Los diagramas estáticos muestran estructura posible y no ejecutan ni evalúan el código. En una traza, cada instantánea se toma **antes** de la instrucción indicada; los efectos de esa instrucción aparecen en la instantánea siguiente. La reproducción recorre datos ya registrados.
+- Explicación didáctica determinista en español e inglés, sincronizada con el paso seleccionado. La explicación ampliada y la IA local opcional están bajo los detalles de la explicación.
+- Diagramas Dagre con geometría ajustada al contenido. Se conserva el motor de diagramas.
+- Las acciones para importar una traza, guardarla o exportar la vista están agrupadas bajo **Guardar o abrir una ejecución**.
+- Exportación de diagramas a SVG o JPG y de trazas como JSON, SVG o HTML autocontenido que se abre sin conexión.
 
 ## Explicación opcional con Ollama
 
-El panel puede solicitar una explicación adicional a un modelo local de Ollama. Actívala y configura un modelo que ya esté instalado; la IA es opcional y CodeFlow Studio ofrece siempre la explicación determinista. Los hechos registrados se identifican como observados y el texto generado por IA se etiqueta aparte; puede contener errores y no constituye evidencia de ejecución. Si Ollama no está disponible, se conserva la explicación determinista.
+La explicación adicional por un modelo local de Ollama es opcional y está bajo los detalles de la explicación. La explicación determinista sigue disponible sin IA. Los hechos registrados se identifican como observados y el texto generado por IA se etiqueta aparte; puede contener errores y no constituye evidencia de ejecución. Si Ollama no está disponible, se conserva la explicación determinista.
 
-Añade la configuración local opcional a `.codeflow.local.json`. Este ejemplo usa un marcador sustituible: reemplaza `modelo-local-ejemplo` por el nombre exacto de un modelo que ya tengas instalado. No hace falta descargar ningún modelo para usar CodeFlow Studio.
+Añade la configuración local opcional a `.codeflow.local.json`. Sustituye `modelo-local-ejemplo` por el nombre exacto de un modelo que ya tengas instalado. No hace falta descargar un modelo para usar CodeFlow Studio.
 
 ```json
 {
@@ -46,11 +38,7 @@ Añade la configuración local opcional a `.codeflow.local.json`. Este ejemplo u
 }
 ```
 
-La comunicación utiliza el endpoint local de chat de Ollama. Consulta la [documentación oficial de la API de chat](https://docs.ollama.com/api/chat). En esta máquina no hay un modelo local configurado. La integración se ha validado con un servidor simulado; la calidad y el comportamiento con un modelo real dependen del modelo instalado y requieren validación con ese modelo.
-
-## Proyecto en desarrollo
-
-CodeFlow Studio continúa en desarrollo activo. Se incorporarán nuevas funcionalidades, mejoras de visualización, optimizaciones y herramientas educativas en futuras versiones.
+La comunicación utiliza el endpoint local de chat de Ollama. Consulta la [documentación oficial de la API de chat](https://docs.ollama.com/api/chat). En esta máquina no hay un modelo local configurado. La integración se ha validado con un servidor simulado; el comportamiento con un modelo real requiere validación con ese modelo.
 
 ## Instalación desde el código fuente
 
@@ -64,7 +52,7 @@ npm run build
 npm start
 ```
 
-Abre la dirección local que indique el CLI. Para crear un diagrama, escribe o pega código Java o Python y pulsa **Crear diagrama**. El análisis estático no ejecuta el programa.
+Abre la dirección local que indique el CLI. Escribe o pega código Java o Python en **Código**, pulsa **Crear diagrama** o usa Ctrl+Enter. El análisis estático no ejecuta el programa.
 
 ## Servidor MCP
 
@@ -101,13 +89,13 @@ node src/cli.ts export trace.json --format html --out trace.html
 
 Consulta [Seguridad](SECURITY.md) para conocer el modelo y sus límites.
 
-No pegues claves, contraseñas ni código confidencial que no quieras guardar en el navegador o incluir en una traza exportada. El borrador del editor y la distribución de paneles se almacenan localmente en el navegador; puedes eliminarlos borrando los datos de este sitio.
+No pegues claves, contraseñas ni código confidencial que no quieras guardar en el navegador o incluir en una traza exportada. El borrador del editor se almacena localmente en el navegador; puedes eliminarlo borrando los datos de este sitio.
 
 ## Alcance y documentación
 
 Solo Java y Python tienen adaptadores operativos. La ejecución admite programas secuenciales de un archivo fuente. La actividad estática cubre un subconjunto de `if`, bucles, `return`, `break` y `continue`; las condiciones no se evalúan y las construcciones no compatibles pueden aparecer como opacas. Las instantáneas, vistas de variables y objetos dependen de la información que exponga cada entorno de ejecución. La ejecución usa los permisos del usuario y sus límites son salvaguardas de mejor esfuerzo, no aislamiento.
 
-Consulta la [guía de usuario](docs/user-guide.md), la [guía para estudiantes](docs/guia-estudiantes.md), la [guía MCP](docs/mcp.md), la [arquitectura](docs/architecture.md), la [guía de adaptadores](docs/adapters.md), el [formato de traza](docs/trace-format.md) y la [hoja de ruta](docs/roadmap.md). El formato neutral de intercambio no implica soporte para otros lenguajes. La visualización usa `@dagrejs/dagre` como dependencia de ejecución.
+Consulta la [guía de usuario](docs/user-guide.md), la [guía para estudiantes](docs/guia-estudiantes.md), la [guía MCP](docs/mcp.md), la [arquitectura](docs/architecture.md), la [guía de adaptadores](docs/adapters.md), el [formato de traza](docs/trace-format.md) y la [hoja de ruta](HOJA_DE_RUTA_CODEFLOW.txt). El formato neutral de intercambio no implica soporte para otros lenguajes. La visualización usa `@dagrejs/dagre` como dependencia de ejecución.
 
 ## Licencia
 

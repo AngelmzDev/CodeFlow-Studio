@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" data-mode="basic">
+<html lang="es" data-mode="student">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -78,13 +78,6 @@
           </div>
           <div class="toolbar">
             <label class="toolbar-choice"
-              ><span class="sr-only" data-i18n="mode">Modo</span
-              ><select id="mode-select" aria-label="Modo" data-i18n-aria="mode">
-                <option value="basic" selected data-i18n="basic">Básico</option>
-                <option value="advanced" data-i18n="advanced">Avanzado</option>
-              </select></label
-            >
-            <label class="toolbar-choice"
               ><span class="sr-only" data-i18n="interfaceLanguage"
                 >Idioma de la interfaz</span
               ><select
@@ -107,14 +100,7 @@
                 <option value="dark" data-i18n="dark">☾ Oscuro</option>
               </select></label
             >
-            <button
-              class="tool-button layout-reset"
-              id="layout-reset"
-              type="button"
-              data-layout-i18n="reset"
-            >
-              Restaurar distribución
-            </button>
+
             <button
               class="tool-button"
               id="import-button"
@@ -153,7 +139,7 @@
             >
               <svg viewBox="0 0 20 20" aria-hidden="true">
                 <path d="m7 4 9 6-9 6z" /></svg
-              ><span data-i18n="runTrace">Run trace</span><kbd>Ctrl/⌘ ↵</kbd>
+              ><span data-i18n="runTrace">Run trace</span><kbd>Ctrl/⌘ ⇧ ↵</kbd>
             </button>
           </div>
         </header>

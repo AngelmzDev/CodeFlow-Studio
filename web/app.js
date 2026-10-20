@@ -109,7 +109,7 @@ function setBusy(busy) {
   b.disabled = busy;
   b.innerHTML = busy
     ? `<span class="spinner" aria-hidden="true"></span><span>${state.uiLanguage === 'es' ? 'Ejecutando…' : 'Tracing…'}</span>`
-    : `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6z"/></svg><span>${t('runTrace', state.uiLanguage)}</span><kbd>Ctrl/⌘ ↵</kbd>`;
+    : `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6z"/></svg><span>${t('runTrace', state.uiLanguage)}</span><kbd>Ctrl/⌘ ⇧ ↵</kbd>`;
 }
 function setEditorMode(replay) {
   $('editor-content').hidden = replay;
@@ -166,8 +166,8 @@ function renderTraceSource(line = 0) {
     const item = code.children[line - 1];
     if (item) {
       const pane = $('trace-source');
-      const top = 12 + line * 20;
-      const bottom = top + 20;
+      const top = 12 + (line - 1) * 22;
+      const bottom = top + 22;
       if (top < pane.scrollTop) pane.scrollTop = top;
       else if (bottom > pane.scrollTop + pane.clientHeight)
         pane.scrollTop = bottom - pane.clientHeight;
@@ -199,8 +199,6 @@ function syncLanguage(language) {
   updateAnalysisAvailability();
 }
 function visibleLanguageLabel(adapter, language) {
-  if (document.documentElement.dataset.mode !== 'basic')
-    return adapter?.label || language;
   const normalized = String(language).toLowerCase();
   if (normalized.includes('python'))
     return t('pythonLanguage', state.uiLanguage);
@@ -516,7 +514,11 @@ function appendVarRow(parent, name, value, change) {
 function renderState(event, index) {
   const content = $('state-content');
   content.replaceChildren();
-  $('event-type').textContent = event ? event.type : '—';
+  $('event-type').textContent = event?.location?.line
+    ? `${t('line', state.uiLanguage)} ${event.location.line}`
+    : event
+      ? eventLabel(event)
+      : '—';
   $('event-type').className =
     `event-type${event?.type === 'exception' ? ' exception' : ''}`;
   $('event-count').textContent =
@@ -592,7 +594,12 @@ function renderState(event, index) {
       row.append(name, loc);
       section.append(row);
     });
-    content.append(section);
+    const details = document.createElement('details');
+    details.className = 'stack-details';
+    const summary = document.createElement('summary');
+    summary.textContent = t('callStack', state.uiLanguage);
+    details.append(summary, section);
+    content.append(details);
   }
   if (
     capabilityHas('arrays', views) ||
@@ -631,7 +638,7 @@ function renderState(event, index) {
       card.textContent = `${id} · ${obj.type || obj.kind}: ${summary}`;
       section.append(card);
     }
-    content.append(section);
+    if (relevant.length) content.append(section);
   }
   if (!content.childElementCount) {
     const empty = document.createElement('div');
@@ -746,7 +753,12 @@ function statusLabel(trace) {
 function onPlayback(event, index) {
   renderTimeline(index);
   const line = event?.location?.line;
-  if (line) state.visitedLines.add(line);
+  state.visitedLines = new Set(
+    state.trace.events
+      .slice(0, index + 1)
+      .map((item) => item.location?.line)
+      .filter(Boolean),
+  );
   if (state.analysisCurrent && state.analysis && line)
     renderCurrentDiagram(line);
   renderState(event, index);
@@ -778,12 +790,17 @@ function applyDiagramZoom() {
   const zoom = $('diagram-zoom').value;
   const stage = $('diagram-stage');
   const previousZoom = stage.dataset.zoom;
-  stage.style.placeItems = zoom === 'fit' ? 'center' : 'start';
+  stage.style.placeItems = 'start';
   if (zoom === 'fit') {
-    svg.style.width = '';
-    svg.style.height = '';
-    svg.style.maxHeight = '';
-    svg.style.maxWidth = '';
+    const box = svg.viewBox.baseVal;
+    const scale = Math.max(
+      0.75,
+      Math.min(1, (stage.clientWidth - 32) / box.width),
+    );
+    svg.style.width = `${box.width * scale}px`;
+    svg.style.height = `${box.height * scale}px`;
+    svg.style.maxHeight = 'none';
+    svg.style.maxWidth = 'none';
   } else {
     const box = svg.viewBox.baseVal;
     const scale = Number(zoom);
@@ -889,7 +906,9 @@ async function exportDiagramJpg() {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
   }
 }
-function renderCurrentDiagram(activeLine = 0) {
+function renderCurrentDiagram(
+  activeLine = state.playback?.state?.location?.line || 0,
+) {
   if (!state.analysisCurrent || !state.analysis) return;
   const analysis = state.analysis;
   const type = $('diagram-type').value;
@@ -959,14 +978,7 @@ function renderCurrentDiagram(activeLine = 0) {
     $('diagram-export-svg').disabled = false;
     $('diagram-export-jpg').disabled = false;
     if (!state.diagramZoomTouched) {
-      const svg = stage.querySelector('svg');
-      const box = svg?.viewBox.baseVal;
-      $('diagram-zoom').value =
-        box &&
-        (box.width > stage.clientWidth * 1.4 ||
-          box.height > stage.clientHeight * 2)
-          ? '1'
-          : 'fit';
+      $('diagram-zoom').value = 'fit';
       stage.dataset.zoom = 'fit';
     }
     applyDiagramZoom();
@@ -1241,8 +1253,7 @@ async function initializeOnline() {
   applyTranslations(state.uiLanguage);
   $('theme-select').value = document.documentElement.dataset.theme;
   $('source-editor').placeholder = t('pasteCode', state.uiLanguage);
-  $('mode-select').value = localStorage.getItem('codeflow-mode') || 'basic';
-  setMode($('mode-select').value);
+  setMode();
   setText('workspace-state', t('localWorkspace', state.uiLanguage));
   try {
     const response = await fetch('/api/adapters', {
@@ -1300,9 +1311,7 @@ async function initializeOnline() {
     syncLanguage(draft.language);
     renderLanguageMenu();
     loadSource(draft.source, draft.filename, true, false);
-  } else if (document.documentElement.dataset.mode === 'advanced')
-    restoreExample();
-  else loadSource('', `main${extensionFor(state.selectedLanguage)}`, false);
+  } else loadSource('', `main${extensionFor(state.selectedLanguage)}`, false);
   $('source-editor').disabled = false;
   updatePosition();
 }
@@ -1316,8 +1325,7 @@ function initializeOffline() {
     localStorage.getItem('codeflow-theme') || 'light';
   $('theme-select').value = document.documentElement.dataset.theme;
   $('source-editor').placeholder = t('pasteCode', state.uiLanguage);
-  $('mode-select').value = localStorage.getItem('codeflow-mode') || 'basic';
-  setMode($('mode-select').value);
+  setMode();
   setText('workspace-state', t('embeddedTrace', state.uiLanguage));
   setText('server-status', t('offlineViewer', state.uiLanguage));
   $('trust-banner').hidden = true;
@@ -1516,37 +1524,10 @@ async function createDiagram() {
     button.textContent = t('createDiagram', state.uiLanguage);
   }
 }
-function setMode(mode) {
-  document.documentElement.dataset.mode = mode;
-  localStorage.setItem('codeflow-mode', mode);
-  const disclosure = $('execution-options');
-  if (state.offline) {
-    disclosure.hidden = true;
-    return;
-  }
-  const target =
-    mode === 'basic' ? $('basic-run-content') : $q('.settings-form');
-  const home = mode === 'basic';
-  const put = (node, anchor) => {
-    if (home) target.append(node);
-    else anchor.before(node);
-  };
-  const stdinLabel = $q('label[for="stdin-input"]');
-  if (home) {
-    put($('trust-check-wrap'), $('trust-check-home'));
-    target.append(stdinLabel, $('stdin-input'));
-    put($('run-button'), $('run-button-home'));
-    disclosure.hidden = false;
-    disclosure.open = false;
-  } else {
-    put($('run-button'), $('run-button-home'));
-    put($('trust-check-wrap'), $('trust-check-home'));
-    $('stdin-home').before(stdinLabel, $('stdin-input'));
-    disclosure.hidden = true;
-    if (!state.source.trim() && !state.dirty) restoreExample();
-  }
-  if (state.adapter) syncLanguage(state.selectedLanguage);
-  if (state.adapters.length) renderLanguageMenu();
+function setMode() {
+  document.documentElement.dataset.mode = 'student';
+  $('execution-options').hidden = state.offline;
+  $('run-setup').hidden = state.offline;
 }
 
 function setLocale(locale) {
@@ -1704,7 +1685,6 @@ function bind() {
     if (state.analysisCurrent) renderCurrentDiagram();
     renderSequence();
   });
-  $('mode-select').addEventListener('change', (e) => setMode(e.target.value));
   $('ui-language').addEventListener('change', (e) => setLocale(e.target.value));
   $('diagram-generate').addEventListener('click', createDiagram);
   $('diagram-type').addEventListener('change', () => renderCurrentDiagram());
@@ -1737,8 +1717,8 @@ function bind() {
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
-      if (document.documentElement.dataset.mode === 'basic') createDiagram();
-      else runTrace();
+      if (e.shiftKey) runTrace();
+      else createDiagram();
       return;
     }
     const editing =

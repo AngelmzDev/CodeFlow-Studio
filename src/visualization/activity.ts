@@ -184,12 +184,11 @@ export function renderActivitySvg(
   const g = new dagre.graphlib.Graph({ multigraph: true })
     .setGraph({
       rankdir: 'TB',
-      nodesep: 46,
-      ranksep: 66,
+      nodesep: 52,
+      ranksep: 44,
       edgesep: 24,
       marginx: 28,
       marginy: 34,
-      acyclicer: 'greedy',
       ranker: 'network-simplex',
     })
     .setDefaultEdgeLabel(() => ({}));
@@ -207,19 +206,27 @@ export function renderActivitySvg(
             ? 'Unión'
             : n.label
         : n.label;
-    const lines = wrap(label, 34, 4);
-    const h =
-      n.kind === 'start'
-        ? 28
-        : n.kind === 'end'
-          ? 36
-          : Math.max(58, lines.length * 16 + 24);
+    const lines = wrap(label, n.kind === 'decision' ? 18 : 28, 5);
+    const textWidth = Math.max(...lines.map((line) => [...line].length)) * 8;
+    // Reserve the central half of a diamond for text, including every wrapped line.
     const w =
-      n.kind === 'decision' || n.kind === 'merge'
-        ? 102
-        : n.kind === 'start' || n.kind === 'end'
-          ? 32
-          : 224;
+      n.kind === 'decision'
+        ? Math.max(180, textWidth * 2 + 40)
+        : n.kind === 'merge'
+          ? 24
+          : n.kind === 'start' || n.kind === 'end'
+            ? 32
+            : Math.max(160, textWidth + (n.kind === 'call' ? 64 : 36));
+    const h =
+      n.kind === 'decision'
+        ? Math.max(88, lines.length * 32 + 40)
+        : n.kind === 'merge'
+          ? 24
+          : n.kind === 'start'
+            ? 28
+            : n.kind === 'end'
+              ? 36
+              : Math.max(56, lines.length * 16 + 28);
     dimensions.set(n.id, { w, h, lines });
     g.setNode(n.id, { width: w, height: h });
   }
@@ -255,12 +262,31 @@ export function renderActivitySvg(
     const routed = g.edge({ v: e.from, w: e.to, name: `${e.id}-${i}` }) as
       | { points?: { x: number; y: number }[]; x?: number; y?: number }
       | undefined;
-    const pts = routed?.points ?? [];
+    const pts = (routed?.points ?? []).map((point) => ({ ...point }));
     if (pts.length < 2) continue;
+    for (const [id, endpoint, adjacent] of [
+      [e.from, 0, 1],
+      [e.to, pts.length - 1, pts.length - 2],
+    ] as const) {
+      const node = nodes.find((n) => n.id === id)!;
+      const pos = g.node(id) as { x: number; y: number };
+      const { w, h } = dimensions.get(id)!;
+      const dx = pts[adjacent]!.x - pos.x,
+        dy = pts[adjacent]!.y - pos.y;
+      if (node.kind === 'decision' || node.kind === 'merge') {
+        const scale =
+          1 / (Math.abs(dx) / (w / 2) + Math.abs(dy) / (h / 2) || 1);
+        pts[endpoint] = { x: pos.x + dx * scale, y: pos.y + dy * scale };
+      } else if (node.kind === 'start' || node.kind === 'end') {
+        const scale =
+          (node.kind === 'start' ? 10 : 12) / (Math.hypot(dx, dy) || 1);
+        pts[endpoint] = { x: pos.x + dx * scale, y: pos.y + dy * scale };
+      }
+    }
     const d = pts
       .map((p, j) => `${j ? 'L' : 'M'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
       .join(' ');
-    body += `<path d="${d}" fill="none" stroke="${c.edge}" stroke-width="1.7" marker-end="url(#cf-arrow)"/>`;
+    body += `<path d="${d}" fill="none" stroke="${c.edge}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#cf-arrow)"/>`;
     if (e.label) {
       const label = localizeEdge(e.label, locale),
         x = routed?.x ?? pts[Math.floor(pts.length / 2)]!.x,
@@ -294,7 +320,8 @@ export function renderActivitySvg(
       body += `<circle cx="${x}" cy="${y}" r="12" fill="${c.panel}" stroke="${c.ink}" stroke-width="2.5"/><circle cx="${x}" cy="${y}" r="7" fill="${c.ink}"/>`;
     else if (n.kind === 'decision' || n.kind === 'merge') {
       body += `<path d="M ${x} ${y0} L ${x + w / 2} ${y} L ${x} ${y + h / 2} L ${x - w / 2} ${y} Z" fill="${fill}" stroke="${isActive ? c.active : c.stroke}" stroke-width="${isActive ? 3 : 1.5}"/>`;
-      body += multiline(x, y - (lines.length - 1) * 8 + 4, lines, ink, 12);
+      if (n.kind === 'decision')
+        body += multiline(x, y - (lines.length - 1) * 8 + 4, lines, ink, 13);
     } else {
       const rx =
         n.kind === 'action' || n.kind === 'call' || n.kind === 'return'
@@ -326,7 +353,7 @@ export function renderActivitySvg(
   const empty = nodes.length
     ? ''
     : `<text x="24" y="108" font-size="14" fill="${c.muted}">${locale === 'es' ? 'No hay pasos que mostrar.' : 'There are no steps to display.'}</text>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="cf-title cf-desc" width="100%" style="max-width:${width}px;height:auto"><title id="cf-title">${esc(title)}</title><desc id="cf-desc">${esc(caption)}</desc><rect width="${width}" height="${height}" fill="${c.bg}"/><g font-family="system-ui,-apple-system,Segoe UI,sans-serif">${body}${empty}<text x="18" y="${height - 12}" font-size="11" fill="${c.muted}">${esc(caption)}</text></g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="cf-title cf-desc" width="100%" style="max-width:${width}px;height:auto"><title id="cf-title">${esc(title)}</title><desc id="cf-desc">${esc(caption)}</desc><rect width="${width}" height="${height}" fill="${c.bg}"/><g font-family="system-ui,-apple-system,Segoe UI,sans-serif">${body}${empty}<text x="18" y="${height - 12}" font-size="11" fill="${c.muted}">${locale === 'es' ? 'Flujo estático · Sí / No: ramas posibles' : 'Static flow · Yes / No: possible branches'}</text></g></svg>`;
 }
 
 export function renderClassSvg(

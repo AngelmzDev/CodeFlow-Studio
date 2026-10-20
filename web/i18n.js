@@ -41,7 +41,7 @@ const messages = {
     column: 'Col.',
     importSource: 'Importar código',
     importTrace: 'Importar traza',
-    runTrace: 'Animar ejecución',
+    runTrace: 'Ejecutar paso a paso',
     runOptional: 'Ver ejecución real (opcional)',
     runConsentNote:
       'La animación ejecuta el código localmente y requiere tu consentimiento.',
