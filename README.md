@@ -4,6 +4,14 @@ CodeFlow Studio es una herramienta local y de código abierto para que estudiant
 
 ![Código, diagrama y ejecución paso a paso](docs/images/codeflow-cover.png)
 
+## Vídeo de presentación
+
+Conoce CodeFlow Studio en 20 segundos: código, diagramas y ejecución paso a paso con los cambios de las variables. Vídeo Full HD con textos en español y música original.
+
+[![Ver el vídeo de presentación de CodeFlow Studio](docs/media/trailer-portada.png)](https://github.com/AngelmzDev/CodeFlow-Studio/blob/main/docs/media/CodeFlow-Studio-trailer.mp4)
+
+[Ver el archivo de vídeo en GitHub](https://github.com/AngelmzDev/CodeFlow-Studio/blob/main/docs/media/CodeFlow-Studio-trailer.mp4) · [Descargar MP4](https://github.com/AngelmzDev/CodeFlow-Studio/releases/download/v0.2.0/CodeFlow-Studio-trailer.mp4)
+
 ## Descargar para Windows
 
 Descarga [CodeFlow-Studio-Windows-x64.exe para Windows 10/11 de 64 bits](https://github.com/AngelmzDev/CodeFlow-Studio/releases/latest). No necesitas instalar Node.js, Python ni Java, ni usar npm. La primera apertura extrae los componentes incluidos en `%LOCALAPPDATA%\CodeFlowStudio`; después se abre la interfaz en el navegador. Consulta la [guía de Windows portable](docs/windows-portable.md) y los [avisos de terceros](THIRD_PARTY_NOTICES.md).
