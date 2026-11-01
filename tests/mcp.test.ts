@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -103,7 +103,10 @@ const trace: Trace = {
 };
 
 test('execution grants are exact, short-lived, and one-use', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'codeflow-mcp-grants-'));
+  // Windows runners may expose TEMP through an 8.3 alias. Use its canonical path.
+  const directory = await realpath(
+    await mkdtemp(join(tmpdir(), 'codeflow-mcp-grants-')),
+  );
   const previous = process.env.CODEFLOW_MCP_EXECUTION;
   process.env.CODEFLOW_MCP_EXECUTION = 'authorized';
   try {
