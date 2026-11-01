@@ -2,7 +2,9 @@ import { spawnSync } from 'node:child_process';
 import { readFile, access } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-export const ROOT = fileURLToPath(new URL('../../', import.meta.url));
+export const ROOT = process.env.CODEFLOW_ROOT
+  ? resolve(process.env.CODEFLOW_ROOT)
+  : fileURLToPath(new URL('../../', import.meta.url));
 async function config(): Promise<{ javaHome?: string; python?: string }> {
   try {
     return JSON.parse(

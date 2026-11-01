@@ -29,3 +29,5 @@ cookies*.json
 .cache/
 .tmp/
 tmp/
+
+dist/

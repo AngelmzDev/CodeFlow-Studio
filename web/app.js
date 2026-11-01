@@ -1,3 +1,4 @@
+import { describeStep } from './step-guide.js';
 import { Playback } from '../src/core/playback.ts';
 import {
   formatValue,
@@ -511,8 +512,110 @@ function appendVarRow(parent, name, value, change) {
   row.append(n, v);
   parent.append(row);
 }
+function renderStepGuide(event, index) {
+  const panel = $('step-guide');
+  panel.replaceChildren();
+  if (!event || !state.trace) return;
+  const info = describeStep(state.trace, index, state.uiLanguage);
+  const es = state.uiLanguage === 'es';
+  const make = (tag, text, cls) => {
+    const el = document.createElement(tag);
+    el.textContent = text;
+    if (cls) el.className = cls;
+    return el;
+  };
+  const head = make('div', '', 'step-guide-head');
+  head.append(
+    make('strong', info.title),
+    make('span', index + 1 + ' / ' + state.trace.events.length),
+  );
+  panel.append(head);
+  if (info.code) panel.append(make('code', info.code, 'step-guide-code'));
+  panel.append(make('p', info.action, 'step-guide-action'));
+  const changes = make('div', '', 'step-guide-changes');
+  changes.append(
+    make('h3', es ? 'Cambios ya observados' : 'Changes already observed'),
+  );
+  if (!info.changes.length)
+    changes.append(
+      make(
+        'p',
+        es
+          ? 'Sin cambios de variables respecto al paso anterior.'
+          : 'No variable changes since the previous step.',
+      ),
+    );
+  for (const item of info.changes) {
+    const row = make('div', '', 'step-change');
+    row.append(
+      make('strong', item.name),
+      make('span', item.before, 'step-before'),
+      make('span', '→'),
+      make('strong', item.after, 'step-after'),
+    );
+    changes.append(row);
+  }
+  changes.append(make('p', info.comparison, 'step-comparison'));
+  panel.append(changes);
+}
+function updateDiagramFocus(diagram, line) {
+  const svg = $('diagram-stage').querySelector('svg');
+  if (!svg) return;
+  const matches = (target) => {
+    const nodes = diagram.nodes.filter(
+      (n) =>
+        !['start', 'end', 'merge'].includes(n.kind) &&
+        n.line <= target &&
+        (n.endLine ?? n.line) >= target,
+    );
+    const span = Math.min(...nodes.map((n) => (n.endLine ?? n.line) - n.line));
+    return nodes
+      .filter((n) => (n.endLine ?? n.line) - n.line === span)
+      .map((n) => n.id);
+  };
+  const active = new Set(line ? matches(line) : []);
+  const visited = new Set([...state.visitedLines].flatMap(matches));
+  svg.querySelectorAll('[data-node-id]').forEach((node) => {
+    node.classList.toggle('active', active.has(node.dataset.nodeId));
+    node.classList.toggle('visited', visited.has(node.dataset.nodeId));
+  });
+  if (!$('diagram-follow').checked || !line) return;
+  const node = svg.querySelector('.active[data-node-id]');
+  if (!node) return;
+  const stage = $('diagram-stage'),
+    bounds = stage.getBoundingClientRect(),
+    box = node.getBoundingClientRect();
+  if (
+    box.top < bounds.top + 20 ||
+    box.bottom > bounds.bottom - 20 ||
+    box.left < bounds.left ||
+    box.right > bounds.right
+  ) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    stage.scrollTo({
+      top: Math.max(
+        0,
+        stage.scrollTop +
+          box.top -
+          bounds.top -
+          stage.clientHeight / 2 +
+          box.height / 2,
+      ),
+      left: Math.max(
+        0,
+        stage.scrollLeft +
+          box.left -
+          bounds.left -
+          stage.clientWidth / 2 +
+          box.width / 2,
+      ),
+      behavior: reduced || state.playback?.playing ? 'instant' : 'smooth',
+    });
+  }
+}
 function renderState(event, index) {
   const content = $('state-content');
+  renderStepGuide(event, index);
   content.replaceChildren();
   $('event-type').textContent = event?.location?.line
     ? `${t('line', state.uiLanguage)} ${event.location.line}`
@@ -791,6 +894,7 @@ function applyDiagramZoom() {
   const stage = $('diagram-stage');
   const previousZoom = stage.dataset.zoom;
   stage.style.placeItems = 'start';
+  stage.style.justifyItems = zoom === 'fit' ? 'center' : 'start';
   if (zoom === 'fit') {
     const box = svg.viewBox.baseVal;
     const scale = Math.max(
@@ -917,6 +1021,7 @@ function renderCurrentDiagram(
   stage.setAttribute('role', 'group');
   stage.setAttribute('aria-label', t('diagramStage', state.uiLanguage));
   if (type === 'classes') {
+    state.renderedDiagram = null;
     method.hidden = true;
     stage.innerHTML = analysis.classes.length
       ? renderClassSvg(analysis.classes, {
@@ -968,13 +1073,21 @@ function renderCurrentDiagram(
   if (selected) {
     state.selectedDiagramId = selected.id;
     method.value = selected.id;
-    stage.innerHTML = renderActivitySvg(selected, {
-      source: analysis.source.content,
-      theme: document.documentElement.dataset.theme,
-      locale: state.uiLanguage,
-      activeLine,
-      visitedLines: [...state.visitedLines],
-    });
+    const renderKey =
+      state.uiLanguage + ':' + document.documentElement.dataset.theme;
+    if (
+      state.renderedDiagram !== selected ||
+      stage.dataset.renderKey !== renderKey ||
+      !stage.querySelector('svg')
+    ) {
+      stage.innerHTML = renderActivitySvg(selected, {
+        source: analysis.source.content,
+        theme: document.documentElement.dataset.theme,
+        locale: state.uiLanguage,
+      });
+      state.renderedDiagram = selected;
+      stage.dataset.renderKey = renderKey;
+    }
     $('diagram-export-svg').disabled = false;
     $('diagram-export-jpg').disabled = false;
     if (!state.diagramZoomTouched) {
@@ -982,6 +1095,7 @@ function renderCurrentDiagram(
       stage.dataset.zoom = 'fit';
     }
     applyDiagramZoom();
+    updateDiagramFocus(selected, activeLine);
     const warnings = [
       ...new Set([
         ...(analysis.diagnostics || []),
@@ -1010,6 +1124,7 @@ function renderCurrentDiagram(
 }
 function acceptTrace(raw) {
   const trace = validateTrace(raw);
+  document.getElementById('execution-options').open = false;
   trace.sources.forEach((source) => assertSourceForView(source.content));
   if (state.unsubscribe) state.unsubscribe();
   if (state.playback) state.playback.pause();
@@ -1535,6 +1650,9 @@ function setLocale(locale) {
   localStorage.setItem('codeflow-language', locale);
   applyTranslations(locale);
   setLayoutLocale(locale);
+  $('previous-button').textContent =
+    locale === 'es' ? '← Anterior' : '← Previous';
+  $('next-button').textContent = locale === 'es' ? 'Siguiente →' : 'Next →';
   explanations.update();
   renderSequence();
   $('diagram-generate').textContent = t('createDiagram', locale);
@@ -1658,6 +1776,10 @@ function bind() {
       e.target.value = '';
     }
   });
+  $('previous-button').textContent =
+    state.uiLanguage === 'es' ? '← Anterior' : '← Previous';
+  $('next-button').textContent =
+    state.uiLanguage === 'es' ? 'Siguiente →' : 'Next →';
   $('previous-button').addEventListener('click', () =>
     state.playback?.previous(),
   );
@@ -1691,6 +1813,18 @@ function bind() {
   $('diagram-zoom').addEventListener('change', () => {
     state.diagramZoomTouched = true;
     applyDiagramZoom();
+  });
+  new ResizeObserver(() => {
+    if (!state.analysisCurrent) return;
+    applyDiagramZoom();
+    if (state.renderedDiagram)
+      updateDiagramFocus(
+        state.renderedDiagram,
+        state.playback?.state?.location?.line || 0,
+      );
+  }).observe($('diagram-stage'));
+  $('diagram-follow').addEventListener('change', () => {
+    if (state.analysisCurrent) renderCurrentDiagram();
   });
   $('diagram-stage').addEventListener('wheel', zoomDiagramWithWheel, {
     passive: false,

@@ -1,0 +1,92 @@
+name: Windows portable release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - run: npm ci
+      - run: npm run check
+
+      - name: Package portable Windows application
+        shell: pwsh
+        run: ./scripts/package-windows.ps1
+
+      - name: Smoke test packaged application
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path 'dist/CodeFlow-Studio-Windows-x64.exe').Path
+          $temp = Join-Path $env:RUNNER_TEMP 'codeflow-windows-smoke'
+          New-Item -ItemType Directory -Force -Path $temp | Out-Null
+          $report = Join-Path $temp 'self-test.txt'
+          $stdout = Join-Path $temp 'stdout.log'
+          $stderr = Join-Path $temp 'stderr.log'
+          $quotedReport = '"' + $report + '"'
+          $process = Start-Process -FilePath $exe -ArgumentList @('--self-test', $quotedReport) -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          if (-not $process.WaitForExit(180000)) {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            throw 'Portable application self-test timed out after 180 seconds.'
+          }
+          if ($process.ExitCode -ne 0) {
+            Get-Content $stdout, $stderr -ErrorAction SilentlyContinue
+            throw "Portable application self-test failed with exit code $($process.ExitCode)."
+          }
+          if (-not (Test-Path $report)) {
+            Get-Content $stdout, $stderr -ErrorAction SilentlyContinue
+            throw 'Portable application self-test did not create its report.'
+          }
+          Get-Content $report
+
+      - name: Upload packaged files as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CodeFlow-Studio-Windows-x64
+          path: |
+            dist/CodeFlow-Studio-Windows-x64.exe
+            dist/CodeFlow-Studio-Windows-x64.exe.sha256
+            dist/Temurin-JDK21-sources.tar.gz
+            dist/Temurin-JDK21-sources.tar.gz.sha256
+          if-no-files-found: warn
+
+      - name: Create or update tag release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $assets = @('dist/CodeFlow-Studio-Windows-x64.exe', 'dist/CodeFlow-Studio-Windows-x64.exe.sha256', 'dist/Temurin-JDK21-sources.tar.gz', 'dist/Temurin-JDK21-sources.tar.gz.sha256')
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag @assets --verify-tag --title "CodeFlow Studio $tag" --notes "Portable Windows x64. Download the EXE to run; the Temurin sources are optional. See docs/windows-portable.md."
+          } else {
+            gh release upload $tag @assets --clobber
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publication failed.' }

@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { ROOT as root } from '../adapters/runtime.ts';
 import type { Trace } from '../core/types.ts';
 import { validateTrace } from '../core/trace.ts';
 import type { Analysis } from '../core/analysis-types.ts';
 import { validateAnalysis } from '../core/analysis.ts';
 import { renderStateSvg } from '../visualization/views.ts';
-const root = fileURLToPath(new URL('../../', import.meta.url));
 export type ExportFormat = 'html' | 'svg' | 'json';
 export async function exportTrace(
   input: Trace,

@@ -60,6 +60,8 @@ const copy = {
       'Los valores se muestran antes de ejecutar la línea resaltada. Avanza para ver sus cambios.',
     exports: 'Guardar o abrir una ejecución',
     explain: '¿Qué está pasando?',
+    follow: 'Seguir paso',
+    legend: 'Ámbar: paso actual · Verde: líneas visitadas',
   },
   en: {
     code: 'Code',
@@ -71,6 +73,8 @@ const copy = {
       'Values are shown before the highlighted line executes. Step forward to see its changes.',
     exports: 'Save or open a recording',
     explain: 'What is happening?',
+    follow: 'Follow step',
+    legend: 'Amber: current step · Green: visited lines',
   },
 };
 export function setLayoutLocale(nextLocale) {
@@ -130,7 +134,20 @@ export function initLayout() {
   }
   setup.append(options);
   body.append(document.querySelector('.timeline-panel'));
+  const guide = document.createElement('div');
+  guide.id = 'step-guide';
+  guide.setAttribute('aria-live', 'polite');
+  body.append(guide);
   body.append($('state-panel'), $('explanation-panel'), $('console-panel'));
+  const focus = document.createElement('label');
+  focus.className = 'diagram-follow';
+  focus.innerHTML =
+    '<input type="checkbox" id="diagram-follow" checked><span data-studio-text="follow"></span>';
+  diagram.querySelector('.diagram-controls').append(focus);
+  const legend = document.createElement('p');
+  legend.className = 'diagram-legend';
+  legend.dataset.studioText = 'legend';
+  $('diagram-stage').after(legend);
   const exports = document.createElement('details');
   exports.className = 'recording-options';
   exports.innerHTML =

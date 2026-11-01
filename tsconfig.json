@@ -13,5 +13,10 @@
     "types": ["node"],
     "lib": ["ES2024", "DOM"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "playwright.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "desktop/**/*.ts",
+    "tests/**/*.ts",
+    "playwright.config.ts"
+  ]
 }

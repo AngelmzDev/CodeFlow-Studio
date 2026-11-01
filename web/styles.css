@@ -1750,7 +1750,7 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0s !important;
   }
 }
 /* Keep compact metadata readable at WCAG AA contrast, including the deliberately muted UI labels. */
@@ -2535,4 +2535,126 @@ select:focus-visible {
 }
 .variable-row {
   border-bottom-color: var(--line);
+}
+
+/* Guided motion: preserve spatial context and give each change time to be read. */
+#step-guide:empty {
+  display: none;
+}
+#step-guide {
+  padding: 18px;
+  border-block: 1px solid var(--line);
+  background: var(--soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.step-guide-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--teal-strong);
+}
+.step-guide-head span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.step-guide-code {
+  display: block;
+  background: var(--panel);
+  padding: 12px;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--amber);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    13px/1.7 Consolas,
+    monospace;
+}
+.step-guide-action {
+  margin: 12px 0;
+}
+.step-guide-changes h3 {
+  font-size: 12px;
+  margin: 16px 0 8px;
+}
+.step-guide-changes > p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.step-change {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font:
+    13px/1.5 Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+}
+.step-before {
+  color: var(--muted);
+}
+.step-after {
+  color: var(--teal-strong);
+}
+.step-comparison {
+  font-size: 11px !important;
+}
+.diagram-follow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.diagram-follow input {
+  accent-color: var(--teal);
+}
+.diagram-legend {
+  flex: none;
+  margin: 0;
+  padding: 9px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+}
+.transport #previous-button,
+.transport #next-button {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px;
+  width: auto;
+}
+.source-editor,
+#trace-code,
+.trace-gutter,
+.line-gutter {
+  font-size: 14px;
+}
+#explanation-content {
+  font-size: 13px;
+}
+:root[data-theme='dark'] .step-guide-head,
+:root[data-theme='dark'] .step-after {
+  color: #9be0cf;
+}
+@keyframes value-arrive {
+  from {
+    background: var(--teal-soft);
+    transform: translateY(3px);
+  }
+  to {
+    background: transparent;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .step-after {
+    animation: value-arrive 0.25s ease-out;
+  }
 }

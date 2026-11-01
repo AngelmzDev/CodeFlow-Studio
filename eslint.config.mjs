@@ -4,6 +4,8 @@ export default [
     ignores: [
       'node_modules/**',
       '.build/**',
+      '.cache/**',
+      'dist/**',
       'test-results/**',
       'playwright-report/**',
     ],

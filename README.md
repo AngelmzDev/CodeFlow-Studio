@@ -4,6 +4,10 @@ CodeFlow Studio es una herramienta local y de código abierto para que estudiant
 
 ![Código, diagrama y ejecución paso a paso](docs/images/codeflow-cover.png)
 
+## Descargar para Windows
+
+Descarga [CodeFlow-Studio-Windows-x64.exe para Windows 10/11 de 64 bits](https://github.com/AngelmzDev/CodeFlow-Studio/releases/latest). No necesitas instalar Node.js, Python ni Java, ni usar npm. La primera apertura extrae los componentes incluidos en `%LOCALAPPDATA%\CodeFlowStudio`; después se abre la interfaz en el navegador. Consulta la [guía de Windows portable](docs/windows-portable.md) y los [avisos de terceros](THIRD_PARTY_NOTICES.md).
+
 ## Explora tu programa
 
 En **Código**, escribe o pega una fuente, importa un archivo o carga un ejemplo. En **Diagrama**, crea una vista estática de la actividad; Java también permite consultar clases. En **Paso a paso**, puedes aceptar el consentimiento y observar una ejecución, con sus variables, explicación y consola. Las opciones de entrada, argumentos y clase de entrada están plegadas dentro de ese apartado. La ejecución requiere consentimiento explícito y utiliza los permisos de tu equipo, así que ejecútala solo con código de confianza.
@@ -42,7 +46,7 @@ La comunicación utiliza el endpoint local de chat de Ollama. Consulta la [docum
 
 ## Instalación desde el código fuente
 
-El proyecto está en desarrollo y todavía no publica ejecutables. Para iniciarlo, clona el repositorio e instala sus dependencias:
+Para trabajar con el código fuente o iniciar la aplicación desde Node.js, clona el repositorio e instala sus dependencias:
 
 ```sh
 git clone https://github.com/AngelmzDev/CodeFlow-Studio.git

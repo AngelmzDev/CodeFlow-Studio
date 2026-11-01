@@ -96,7 +96,7 @@ const multiline = (
   size = 13,
   anchor = 'middle',
 ) =>
-  `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}">${lines.map((line, i) => `<tspan x="${x}" dy="${i ? 16 : 0}">${esc(line)}</tspan>`).join('')}</text>`;
+  `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}">${lines.map((line, i) => `<tspan x="${x}" dy="${i ? 20 : 0}">${esc(line)}</tspan>`).join('')}</text>`;
 const localizeEdge = (label: string, locale: 'es' | 'en') => {
   const key = label.trim().toLowerCase();
   const es: Record<string, string> = {
@@ -219,14 +219,14 @@ export function renderActivitySvg(
             : Math.max(160, textWidth + (n.kind === 'call' ? 64 : 36));
     const h =
       n.kind === 'decision'
-        ? Math.max(88, lines.length * 32 + 40)
+        ? Math.max(88, lines.length * 40 + 56)
         : n.kind === 'merge'
           ? 24
           : n.kind === 'start'
             ? 28
             : n.kind === 'end'
               ? 36
-              : Math.max(56, lines.length * 16 + 28);
+              : Math.max(56, lines.length * 20 + 48);
     dimensions.set(n.id, { w, h, lines });
     g.setNode(n.id, { width: w, height: h });
   }
@@ -321,7 +321,7 @@ export function renderActivitySvg(
     else if (n.kind === 'decision' || n.kind === 'merge') {
       body += `<path d="M ${x} ${y0} L ${x + w / 2} ${y} L ${x} ${y + h / 2} L ${x - w / 2} ${y} Z" fill="${fill}" stroke="${isActive ? c.active : c.stroke}" stroke-width="${isActive ? 3 : 1.5}"/>`;
       if (n.kind === 'decision')
-        body += multiline(x, y - (lines.length - 1) * 8 + 4, lines, ink, 13);
+        body += multiline(x, y - (lines.length - 1) * 10 - 2, lines, ink, 15);
     } else {
       const rx =
         n.kind === 'action' || n.kind === 'call' || n.kind === 'return'
@@ -333,12 +333,24 @@ export function renderActivitySvg(
         body += `<path d="M ${x0 + 14} ${y - 7} h 10 v 14 h -10 z M ${x0 + 17} ${y - 11} v 4 M ${x0 + 21} ${y - 11} v 4" fill="none" stroke="${c.accent}" stroke-width="1.7"/>`;
       body += multiline(
         x + shift,
-        y - (lines.length - 1) * 8 + 4,
+        y - (lines.length - 1) * 10 - 2,
         lines,
         ink,
-        13,
+        15,
       );
     }
+    if (n.line > 0 && !['start', 'end', 'merge'].includes(n.kind))
+      body +=
+        '<text x="' +
+        x +
+        '" y="' +
+        (n.kind === 'decision' ? y0 - 8 : y0 + h - 10) +
+        '" text-anchor="middle" font-size="10" fill="' +
+        c.muted +
+        '">' +
+        (locale === 'es' ? 'Línea ' : 'Line ') +
+        n.line +
+        '</text>';
     body += '</g>';
   }
   const caption =
@@ -353,7 +365,7 @@ export function renderActivitySvg(
   const empty = nodes.length
     ? ''
     : `<text x="24" y="108" font-size="14" fill="${c.muted}">${locale === 'es' ? 'No hay pasos que mostrar.' : 'There are no steps to display.'}</text>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="cf-title cf-desc" width="100%" style="max-width:${width}px;height:auto"><title id="cf-title">${esc(title)}</title><desc id="cf-desc">${esc(caption)}</desc><rect width="${width}" height="${height}" fill="${c.bg}"/><g font-family="system-ui,-apple-system,Segoe UI,sans-serif">${body}${empty}<text x="18" y="${height - 12}" font-size="11" fill="${c.muted}">${locale === 'es' ? 'Flujo estático · Sí / No: ramas posibles' : 'Static flow · Yes / No: possible branches'}</text></g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="cf-title cf-desc" width="100%" style="max-width:${width}px;height:auto"><title id="cf-title">${esc(title)}</title><desc id="cf-desc">${esc(caption)}</desc><rect width="${width}" height="${height}" fill="${c.bg}"/><g font-family="system-ui,-apple-system,Segoe UI,sans-serif"><style>g[data-node-id] > rect,g[data-node-id] > path {transition:fill .22s ease,stroke .22s ease} g.visited > rect,g.visited > path {fill:${c.visited}} g.active > rect,g.active > path {fill:${c.active};stroke:${c.active};stroke-width:3} g.active > text {fill:${theme === 'dark' ? '#17212a' : '#ffffff'}} g.node-decision.active > text:last-child {fill:${c.ink}} @media(prefers-reduced-motion:reduce){g[data-node-id] > rect,g[data-node-id] > path{transition:none}}</style>${body}${empty}<text x="18" y="${height - 12}" font-size="11" fill="${c.muted}">${locale === 'es' ? 'Flujo estático · Sí / No: ramas posibles' : 'Static flow · Yes / No: possible branches'}</text></g></svg>`;
 }
 
 export function renderClassSvg(

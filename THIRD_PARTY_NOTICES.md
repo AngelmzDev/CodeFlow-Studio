@@ -34,3 +34,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+## Portable Windows runtimes
+
+La distribución portable incorpora Node.js, Python y Eclipse Temurin JDK. Sus versiones y detalles del paquete se registran en [`desktop/runtimes.json`](desktop/runtimes.json); consulta también los avisos entregados dentro del paquete y las fuentes enlazadas en ese manifiesto.
+
+- **Node.js** se distribuye bajo la licencia MIT. El paquete incluye su aviso en `runtime/node/LICENSE`.
+- **Python** se distribuye bajo la Python Software Foundation License (PSF). El paquete incluye su aviso en `runtime/python/LICENSE.txt`.
+- **Eclipse Temurin JDK** se distribuye bajo GPLv2 con la Classpath Exception. El paquete conserva `runtime/jdk/legal/` y las fuentes correspondientes, incluido `lib/src.zip` cuando está disponible.
+
+Los avisos y licencias de otros componentes redistribuidos se conservan en el manifiesto y dentro del paquete. Consulta las páginas de upstream indicadas allí para el código fuente y las condiciones aplicables. Estos avisos identifican las licencias declaradas por los proyectos; no constituyen asesoramiento legal.
+
+El archivo completo de fuentes de Temurin correspondiente al binario se publica junto al ejecutable como Temurin-JDK21-sources.tar.gz, con su SHA256. Su URL de procedencia y huella están fijadas en desktop/runtimes.json (jdkSources). No es necesario descargarlo para usar la aplicación.

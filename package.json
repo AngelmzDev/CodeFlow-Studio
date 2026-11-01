@@ -1,6 +1,6 @@
 {
   "name": "codeflow-studio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Language-neutral, evidence-driven program execution studio",
@@ -18,8 +18,9 @@
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
     "test:e2e": "playwright test",
-    "format": "prettier --write src web tests scripts *.ts *.mjs *.json docs *.md skills .github",
-    "format:check": "prettier --check src web tests scripts *.ts *.mjs *.json docs *.md skills .github"
+    "format": "prettier --write src web tests scripts desktop *.ts *.mjs *.json docs *.md skills .github",
+    "format:check": "prettier --check src web tests scripts desktop *.ts *.mjs *.json docs *.md skills .github",
+    "package:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-windows.ps1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

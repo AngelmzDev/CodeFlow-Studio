@@ -109,8 +109,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   if (command === 'serve') {
     await ensureBuild();
     const port = Number(parsed.get('port') ?? 4310);
-    if (!Number.isInteger(port) || port < 1 || port > 65535)
-      throw new Error('Port must be 1–65535');
+    if (!Number.isInteger(port) || port < 0 || port > 65535)
+      throw new Error('Port must be 0–65535 (0 selects a free port)');
     const { url } = await startServer({ port, registry });
     console.log(
       'CodeFlow Studio: ' +
