@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/branding/logo.svg" alt="Logo de CodeFlow-Studio" width="128" height="128">
+</p>
+
 # CodeFlow Studio
 
 CodeFlow Studio es una herramienta local y de código abierto para que estudiantes exploren cómo se organiza un programa y qué ocurre durante su ejecución. La interfaz se organiza en tres apartados: **Código**, **Diagrama** y **Paso a paso**. Analiza programas Java y Python para mostrar diagramas estáticos y, cuando se solicita expresamente, puede registrar y reproducir una ejecución local.
